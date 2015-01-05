@@ -120,10 +120,10 @@ ln -s $HOME/blendercam/config blender-source/
 echo "-------------------------------------------"
 echo "Note: Failures are normal if the addons already exist. Coding TODO check individually and either skip if exists or replace with newer version."
 echo "-------------------------------------------"
-cp -i $HOME/blendercam/scripts/addons/* blender-source/scripts/addons/
+cp -r -i $HOME/blendercam/scripts/addons/* blender-source/scripts/addons/
 echo 'Copied over addons to scripts/addons/.'
 #ln -s $HOME/blendercam/scripts/addons/* blender-source/scripts/addons/
-cp -i $HOME/blendercam/scripts/presets/* blender-source/scripts/presets/
+cp -r -i $HOME/blendercam/scripts/presets/* blender-source/scripts/presets/
 echo 'Copied blenderCAM presets over to blender scripts/presets/.'
 #ln -s $HOME/blendercam/scripts/presets/* blender-source/scripts/presets/
 
