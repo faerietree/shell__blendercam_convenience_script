@@ -6,12 +6,17 @@
 
 # FETCH
 # Fetch or update polygon sources:
-wget https://pypi.python.org/packages/source/P/Polygon3/Polygon3-3.0.7.zip
-bzip2 -d Polygon3-3.0.7.zip
+cd
+rm Polygon3-3.0.7.zip # to make sure no broken/incomplete zip persists
+wget "https://pypi.python.org/packages/source/P/Polygon3/Polygon3-3.0.7.zip" -O Polygon3.zip
+unzip Polygon3.zip
+rm python-polygon
 ln -s Polygon3-3.0.7/ python-polygon
 
 # fetch or update shapely source repository
-PYTHON_SHAPELY=$(find $HOME -type d -name '*python-shapely*')
+SEEK="python-shapely"
+echo "Looking for $SEEK:"
+PYTHON_SHAPELY=$(find $HOME -type d -name "*$SEEK*")
 if [ !$PYTHON_SHAPELY ]; then 
 	git clone git@github.com:Toblerity/Shapely.git python-shapely
 else 
@@ -21,7 +26,9 @@ else
 fi
 
 # fetch or update numpy source repository
-PYTHON_NUMPY=$(find $HOME -type d -name '*python-numpy*')
+SEEK="python-numpy"
+echo "Looking for $SEEK:"
+PYTHON_NUMPY=$(find $HOME -type d -name "*$SEEK*")
 if [ !$PYTHON_NUMPY ]; then
 	git clone git://github.com/numpy/numpy.git python-numpy
 else 
@@ -29,8 +36,8 @@ else
 	git pull
 	cd
 fi
-wget http://sourceforge.net/projects/numpy/files/NumPy/1.9.1/numpy-1.9.1.tar.gz/download?use_mirror=skylink&r=http%3A%2F%2Fsourceforge.net%2Fprojects%2Fnumpy%2Ffiles%2FNumPy%2F1.9.1%2F&use_mirror=skylink
-tar xf numpy-1.9.1.tar.gz --directory python-numpy-snapshot
+wget "http://sourceforge.net/projects/numpy/files/NumPy/1.9.1/numpy-1.9.1.tar.gz/download?use_mirror=skylink&r=http%3A%2F%2Fsourceforge.net%2Fprojects%2Fnumpy%2Ffiles%2FNumPy%2F1.9.1%2F&use_mirror=skylink" -O numpy.tar.gz
+tar xf numpy.tar.gz --directory python-numpy-snapshot
 
 
 # BUILD
@@ -59,19 +66,26 @@ sudo python3 setup.py build
 # INTEGRATE BLENDERCAM INTO BLENDER
 # setup up symbolic links:
 cd 
+rm ./blender-source/python/lib/python3.4/numpy
 ln -s ./python-numpy-snapshot/numpy ./blender-source/python/lib/python3.4/
+
+rm ./blender-source/python/lib/python3.4/shapely
 ln -s ./python-shapely/shapely ./blender-source/python/lib/python3.4/
+
 l
+rm ./blender-source/python/lib/python3.4/Polygon
 ln -s ./python-polygon/Polygon ./blender-source/python/lib/python3.4/
 
 cd 
-ln -s blendercam/config blender-source/
-ln -s blendercam/scripts/addons/* blender-source/scripts/addons/
-ln -s blendercam/scripts/presets/* blender-source/scripts/presets/
+rm ./blender-source/config # <-- not deletes if it's a directory, thus this is safe.
+ln -s $HOME/blendercam/config blender-source/
+# TODO iterate, i.e. treat one by one and remove existing old version first.
+ln -s $HOME/blendercam/scripts/addons/* blender-source/scripts/addons/
+ln -s $HOME/blendercam/scripts/presets/* blender-source/scripts/presets/
 
 # LAUNCH BLENDER
 cd
-chmod +x ./blender-source/blender
-./blender-source/blender
-
+chmod +x ./blender-source/../blender
+ln -s ./blender-source/../blender blender
+blender
 
