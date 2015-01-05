@@ -13,12 +13,17 @@ Usage:
 ---
 
 * Create link blender-source in your Home directory (adapt version and remove rc1):
+
     cd $HOME
     ln -s ./blender-2.73-rc1-linux-glibc211-x86_64/2.73 blender-source
+
 * Make script executable (required only once):
+
     chmod +x ~/path/to/buildblendercam_on_linux.sh
+
 * Launch this convenience script:
+
     ~/path/to/buildblendercam_on_linux.sh
 
 
-* Follow the progress of the script, it'll need input.
+* Follow the progress of the script, it may need input.
