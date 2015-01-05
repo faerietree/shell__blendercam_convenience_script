@@ -1,8 +1,10 @@
 BlenderCAM
 =====
+http://blendercam.blogspot.cz/
+Thanks to our hero Vilem Novak for making blender engineers happy! 
+
 Download, update, library build, setup convenience script.
 -----
-
 
 Note: It may be that the current blenderCAM addon is not yet compatible with the newest blender!
 
