@@ -12,6 +12,7 @@ echo "====== FETCH"
 # Fetch or update polygon sources:
 cd
 VERSION="3-3.0.7"
+echo 'Fetching Polygon python library version '$VERSION':'
 FILE="Polygon"$VERSION".zip"
 if [ -f $FILE ]; then
 	rm $FILE # to make sure no broken/incomplete zip persists
@@ -26,6 +27,7 @@ if ! [[ -d $DIR ]]; then
 fi
 rm python-polygon
 ln -s "$DIR/" python-polygon
+echo '-----------------'
 
 # fetch or update shapely source repository
 SEEK="python-shapely"
@@ -41,26 +43,31 @@ else
 	git pull
 	cd
 fi
+echo '-----------------'
 
 # fetch or update numpy source repository
 SEEK="python-numpy"
 echo "Looking for $SEEK:"
-PYTHON_NUMPY=$(find $HOME -type d -name "*$SEEK*")
-echo "Result: $PYTHON_NUMPY"
-if ! [[ $PYTHON_NUMPY ]]; then
+#PYTHON_NUMPY=$(find $HOME -type d -name "*$SEEK*")
+#echo "Result: $PYTHON_NUMPY"
+if ! [[ -d $SEEK ]]; then
 	echo 'Not found.'
 	git clone git://github.com/numpy/numpy.git "./"$SEEK
 else 
-	echo 'Found it in folder: '$PYTHON_NUMPY
-	cd $PYTHON_NUMPY
+	echo 'Found it in folder: '$SEEK
+	cd $SEEK
 	git pull
 	cd
 fi
 rm numpy.tar.gz # <-- because it may be a broken/incomplete download.
+VERSION="1.9.1"
 if ! [[ -f numpy.tar.gz ]]; then
-	wget "http://sourceforge.net/projects/numpy/files/NumPy/1.9.1/numpy-1.9.1.tar.gz/download?use_mirror=skylink&r=http%3A%2F%2Fsourceforge.net%2Fprojects%2Fnumpy%2Ffiles%2FNumPy%2F1.9.1%2F&use_mirror=skylink" -O numpy.tar.gz
+	echo "Downloading numpy sources: "
+	wget "http://sourceforge.net/projects/numpy/files/NumPy/$VERSION/numpy-$VERSION"".tar.gz/download?use_mirror=skylink&r=http%3A%2F%2Fsourceforge.net%2Fprojects%2Fnumpy%2Ffiles%2FNumPy%2F1.9.1%2F&use_mirror=skylink" -O numpy.tar.gz
 fi
-tar xf numpy.tar.gz --directory python-numpy-snapshot
+tar xzf numpy.tar.gz --directory .
+mv "numpy-"$VERSION python-numpy-snapshot #overwrites!
+echo '-----------------'
 	
 
 
@@ -96,12 +103,15 @@ echo "======= INTEGRATE INTO BLENDER"
 cd 
 rm ./blender-source/python/lib/python3.4/numpy
 ln -s ./python-numpy-snapshot/numpy ./blender-source/python/lib/python3.4/
+echo 'Linked numpy.'
 
 rm ./blender-source/python/lib/python3.4/shapely
 ln -s ./python-shapely/shapely ./blender-source/python/lib/python3.4/
+echo 'Linked shapely.'
 
 rm ./blender-source/python/lib/python3.4/Polygon
 ln -s ./python-polygon/Polygon ./blender-source/python/lib/python3.4/
+echo 'Linked polygon.'
 
 cd 
 rm ./blender-source/config # <-- not deletes if it's a directory, thus this is safe.
@@ -111,8 +121,10 @@ echo "-------------------------------------------"
 echo "Note: Failures are normal if the addons already exist. Coding TODO check individually and either skip if exists or replace with newer version."
 echo "-------------------------------------------"
 cp -i $HOME/blendercam/scripts/addons/* blender-source/scripts/addons/
+echo 'Copied over addons to scripts/addons/.'
 #ln -s $HOME/blendercam/scripts/addons/* blender-source/scripts/addons/
 cp -i $HOME/blendercam/scripts/presets/* blender-source/scripts/presets/
+echo 'Copied blenderCAM presets over to blender scripts/presets/.'
 #ln -s $HOME/blendercam/scripts/presets/* blender-source/scripts/presets/
 
 # LAUNCH BLENDER
