@@ -1,3 +1,5 @@
+#!/bin/sh
+
 # PREREQUISITES:
 # Set the corresponding symbolic link for blender: (blender must exist in $HOME directory)
 #ln -s ./blender-2.73-rc1-linux-glibc211-x86_64/blender blender
@@ -5,22 +7,37 @@
 
 
 # FETCH
+echo "================="
+echo "====== FETCH"
 # Fetch or update polygon sources:
 cd
-rm Polygon3-3.0.7.zip # to make sure no broken/incomplete zip persists
-wget "https://pypi.python.org/packages/source/P/Polygon3/Polygon3-3.0.7.zip" -O Polygon3.zip
-unzip Polygon3.zip
+VERSION="3-3.0.7"
+FILE="Polygon"$VERSION".zip"
+if [ -f $FILE ]; then
+	rm $FILE # to make sure no broken/incomplete zip persists
+fi
+
+DIR="Polygon"$VERSION
+# exists and is directory?
+if ! [[ -d $DIR ]]; then
+	wget "https://pypi.python.org/packages/source/P/Polygon3/$FILE" -O Polygon3.zip
+	unzip Polygon3.zip
+	rm Polygon3.zip
+fi
 rm python-polygon
-ln -s Polygon3-3.0.7/ python-polygon
+ln -s "$DIR/" python-polygon
 
 # fetch or update shapely source repository
 SEEK="python-shapely"
 echo "Looking for $SEEK:"
-PYTHON_SHAPELY=$(find $HOME -type d -name "*$SEEK*")
-if [ !$PYTHON_SHAPELY ]; then 
-	git clone git@github.com:Toblerity/Shapely.git python-shapely
+#PYTHON_SHAPELY=$(find $HOME -type d -name "*$SEEK*")
+#echo "Result: $PYTHON_SHAPELY"
+if ! [[ -d $SEEK ]]; then 
+	echo 'Not found. Will fetch into '$SEEK':'
+	git clone git@github.com:Toblerity/Shapely.git "./$SEEK"
 else 
-	cd python-shapely
+	echo 'Found it in folder: '$SEEK
+	cd $SEEK
 	git pull
 	cd
 fi
@@ -29,18 +46,27 @@ fi
 SEEK="python-numpy"
 echo "Looking for $SEEK:"
 PYTHON_NUMPY=$(find $HOME -type d -name "*$SEEK*")
-if [ !$PYTHON_NUMPY ]; then
-	git clone git://github.com/numpy/numpy.git python-numpy
+echo "Result: $PYTHON_NUMPY"
+if ! [[ $PYTHON_NUMPY ]]; then
+	echo 'Not found.'
+	git clone git://github.com/numpy/numpy.git "./"$SEEK
 else 
-	cd python-numpy
+	echo 'Found it in folder: '$PYTHON_NUMPY
+	cd $PYTHON_NUMPY
 	git pull
 	cd
 fi
-wget "http://sourceforge.net/projects/numpy/files/NumPy/1.9.1/numpy-1.9.1.tar.gz/download?use_mirror=skylink&r=http%3A%2F%2Fsourceforge.net%2Fprojects%2Fnumpy%2Ffiles%2FNumPy%2F1.9.1%2F&use_mirror=skylink" -O numpy.tar.gz
+rm numpy.tar.gz # <-- because it may be a broken/incomplete download.
+if ! [[ -f numpy.tar.gz ]]; then
+	wget "http://sourceforge.net/projects/numpy/files/NumPy/1.9.1/numpy-1.9.1.tar.gz/download?use_mirror=skylink&r=http%3A%2F%2Fsourceforge.net%2Fprojects%2Fnumpy%2Ffiles%2FNumPy%2F1.9.1%2F&use_mirror=skylink" -O numpy.tar.gz
+fi
 tar xf numpy.tar.gz --directory python-numpy-snapshot
+	
 
 
 # BUILD
+echo "================="
+echo "====== BUILD"
 #sudo aptitude install python-dev
 #which python
 #python --version
@@ -64,6 +90,8 @@ sudo python3 setup.py build
 
 
 # INTEGRATE BLENDERCAM INTO BLENDER
+echo "================="
+echo "======= INTEGRATE INTO BLENDER"
 # setup up symbolic links:
 cd 
 rm ./blender-source/python/lib/python3.4/numpy
@@ -72,7 +100,6 @@ ln -s ./python-numpy-snapshot/numpy ./blender-source/python/lib/python3.4/
 rm ./blender-source/python/lib/python3.4/shapely
 ln -s ./python-shapely/shapely ./blender-source/python/lib/python3.4/
 
-l
 rm ./blender-source/python/lib/python3.4/Polygon
 ln -s ./python-polygon/Polygon ./blender-source/python/lib/python3.4/
 
@@ -80,12 +107,18 @@ cd
 rm ./blender-source/config # <-- not deletes if it's a directory, thus this is safe.
 ln -s $HOME/blendercam/config blender-source/
 # TODO iterate, i.e. treat one by one and remove existing old version first.
+echo "-------------------------------------------"
+echo "Note: Failures are normal if the addons already exist. Coding TODO check individually and either skip if exists or replace with newer version."
+echo "-------------------------------------------"
 ln -s $HOME/blendercam/scripts/addons/* blender-source/scripts/addons/
 ln -s $HOME/blendercam/scripts/presets/* blender-source/scripts/presets/
 
 # LAUNCH BLENDER
+echo "================="
+echo "======= LAUNCH "
 cd
 chmod +x ./blender-source/../blender
+rm blender
 ln -s ./blender-source/../blender blender
-blender
+./blender
 
