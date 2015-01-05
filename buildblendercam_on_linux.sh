@@ -70,7 +70,7 @@ echo "====== BUILD"
 #sudo aptitude install python-dev
 #which python
 #python --version
-
+echo "Installing additional packages if not exist: python3-dev, cython, libgeos-dev:"
 sudo aptitude install python3-dev
 which python3
 python3 --version
@@ -110,8 +110,10 @@ ln -s $HOME/blendercam/config blender-source/
 echo "-------------------------------------------"
 echo "Note: Failures are normal if the addons already exist. Coding TODO check individually and either skip if exists or replace with newer version."
 echo "-------------------------------------------"
-ln -s $HOME/blendercam/scripts/addons/* blender-source/scripts/addons/
-ln -s $HOME/blendercam/scripts/presets/* blender-source/scripts/presets/
+cp -i $HOME/blendercam/scripts/addons/* blender-source/scripts/addons/
+#ln -s $HOME/blendercam/scripts/addons/* blender-source/scripts/addons/
+cp -i $HOME/blendercam/scripts/presets/* blender-source/scripts/presets/
+#ln -s $HOME/blendercam/scripts/presets/* blender-source/scripts/presets/
 
 # LAUNCH BLENDER
 echo "================="
