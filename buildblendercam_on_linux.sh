@@ -24,6 +24,8 @@ echo "================="
 echo "====== INPUT"
 #echo $#
 SHALL_REDOWNLOAD=1
+SHALL_REBUILD=0
+
 SHALL_INSTALL_PACKAGES=false
 PACKAGE_MANAGER_INSTALL_COMMAND=' apt-get install ' #because it's available most often?
 
@@ -43,6 +45,10 @@ do
 			
         --no-redownload)
             SHALL_REDOWNLOAD=0
+	        shift
+            ;;
+        --rebuild)
+            SHALL_REBUILD=1
 	        shift
             ;;
 			
@@ -186,43 +192,61 @@ echo "================="
 echo "====== BUILD"
 
 if [[ $SHALL_INSTALL_PACKAGES ]]; then
+	echo 'Package install command: '$PACKAGE_MANAGER_INSTALL_COMMAND
 	echo "Installing additional packages if not exist: python3-dev, cython, libgeos-dev:"
     sudo $PACKAGE_MANAGER_INSTALL_COMMAND cython
     sudo $PACKAGE_MANAGER_INSTALL_COMMAND libgeos-dev
     #sudo aptitude install python-dev
     #which python
     #python --version
-	echo $PACKAGE_MANAGER_INSTALL_COMMAND
 	echo 'As it is not guarantueed that the python3 version in the package repositories match the blender version: '$PYTHON_VERSION_2DIGITS'. We will custom download and (alt)install the correct version.'
 #    sudo $PACKAGE_MANAGER_INSTALL_COMMAND python3-dev python3-devel
 #    sudo $PACKAGE_MANAGER_INSTALL_COMMAND python3-numpy
     which python3
     python3 --version
+fi
+
+
+echo ""
+echo "================="
+echo "======= CREATE MATCHING PYTHON"
+cd
+if [ -f python.tgz ] && [ $SHALL_REDOWNLOAD -ne 0 ]; then
 	echo 'Deleting previously downloaded python (it may be broken so redownload to be safe):'
-	cd
-	if [ -f python.tgz ]; then
-		rm python.tgz
-	fi
-	echo '*done*'
-	
-	PYTHON_VERSION=$PYTHON_VERSION_2DIGITS'.0'
-	echo 'Downloading python in version '$PYTHON_VERSION':'
-	wget https://www.python.org/ftp/python/$PYTHON_VERSION/Python-$PYTHON_VERSION.tgz  -O python.tgz
-	echo 'Unpacking ...'
-	tar xzf python.tgz
-	echo '*done*'
-	
-	echo 'Building python in directory ./Python-'$PYTHON_VERSION
-	cd './Python-'$PYTHON_VERSION
-	PATH_TO_ALTINSTALL=$HOME/lib/
+    rm python.tgz
+fi
+echo '*done*'
+
+PYTHON_VERSION=$PYTHON_VERSION_2DIGITS'.0'
+if ! [[ -f python.tgz ]]; then
+    echo 'Downloading python in version '$PYTHON_VERSION':'
+    wget https://www.python.org/ftp/python/$PYTHON_VERSION/Python-$PYTHON_VERSION.tgz  -O python.tgz
+fi
+
+if ! [[ -d "Python-"$PYTHON_VERSION ]]; then
+    echo 'Unpacking ...'
+    tar xzf python.tgz
+    echo '*done*'
+fi
+
+PATH_TO_ALTINSTALL=$HOME/lib/
+PATH_TO_PYTHON=$PATH_TO_ALTINSTALL'/bin/python3.4'
+if [ ! -f $PATH_TO_PYTHON ] || [ $SHALL_REBUILD_MATCHING_PYTHON ]; then
+    echo 'Building python in directory ./Python-'$PYTHON_VERSION
+    cd './Python-'$PYTHON_VERSION
+    pwd
 	echo 'Using prefix:'$PATH_TO_ALTINSTALL
 	ls
 	./configure --prefix=$PATH_TO_ALTINSTALL
-	make
-	#make altinstall
-	echo 'Using python altinstall binary '$PATH_TO_ALTINSTALL'.'
-	PATH_TO_PYTHON=$PATH_TO_ALTINSTALL'/python'
+	#make
+	make altinstall
+	echo '*done*'
+    echo '-----------------'
+	
+    echo 'Using python altinstall binary '$PATH_TO_PYTHON' for the following library builds.'
+	
 fi
+
 
 
 
@@ -292,7 +316,8 @@ ln -s $HOME/blendercam/config blender-source/
 echo '*done*'
 
 # TODO iterate, i.e. treat one by one and remove existing old version first.
-echo "-------------------------------------------"
+#echo "-------------------------------------------"
+echo '-----------------'
 echo 'Cleaning previously linked(older script version) or copied over addons (files only!):'
 rm blender-source/scripts/addons/cam
 rm blender-source/scripts/addons/print_3d
