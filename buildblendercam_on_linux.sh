@@ -107,6 +107,7 @@ DIR="Polygon"$VERSION
 if ! [[ -d $DIR ]]; then
 	echo 'Found no '$DIR'. Fetching it: '
 	wget "https://pypi.python.org/packages/source/P/Polygon3/$FILE" -O Polygon3.zip
+	#wget "https://bitbucket.org/jraedler/polygon3/downloads/$FILE" -O Polygon3.zip
 	echo 'Unzipping: '
 	unzip Polygon3.zip
 	echo '*done*'
@@ -219,8 +220,14 @@ ln -s $HOME/python-shapely/shapely ./blender-source/python/lib/python3.4/
 echo 'Linked shapely.'
 
 rm ./blender-source/python/lib/python3.4/Polygon
-ln -s $HOME/python-polygon/Polygon ./blender-source/python/lib/python3.4/
+#ln -s $HOME/python-polygon/Polygon ./blender-source/python/lib/python3.4/
+echo 'Using build/.../Polygon as there cPolygon exists. Do not copy over or symlink ./Polygon instead. It will not contain compiled cPolygon. The instructions on Blendercam.blogspot.cz did not work for me.'
+ln -s "$HOME/python-polygon/build/lib.linux-$(uname -m)-3.2/Polygon" ./blender-source/python/lib/python3.4/
+python-polygon/build/lib.linux-x86_64-3.2/Polygon/
 echo 'Linked polygon.'
+ln -s $HOME/python-polygon/build/lib.linux-$(uname -m)-3.2/Polygon/*.so ./blender-source/../lib/
+echo 'Linked static objects to blenderxyz/lib/ (e.g. cPolygon.so).'
+echo 'Static object in lib/ should now provide: cPolygon.o  gpc.o  PolyUtil.o'
 
 cd 
 rm ./blender-source/config # <-- not deletes if it's a directory, thus this is safe.
