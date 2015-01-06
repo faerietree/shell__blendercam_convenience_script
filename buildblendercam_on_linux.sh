@@ -47,7 +47,7 @@ do
             SHALL_REDOWNLOAD=0
 	        shift
             ;;
-        --rebuild)
+        --rebuild*)
             SHALL_REBUILD=1
 	        shift
             ;;
@@ -230,8 +230,11 @@ if ! [[ -d "Python-"$PYTHON_VERSION ]]; then
 fi
 
 PATH_TO_ALTINSTALL=$HOME/lib/
-PATH_TO_PYTHON=$PATH_TO_ALTINSTALL'/bin/python3.4'
-if [ ! -f $PATH_TO_PYTHON ] || [ $SHALL_REBUILD_MATCHING_PYTHON ]; then
+if ! [[ -d $PATH_TO_ALTINSTALL ]]; then
+    mkdir $PATH_TO_ALTINSTALL
+fi
+PATH_TO_PYTHON=$PATH_TO_ALTINSTALL'/bin/python'$PYTHON_VERSION_2DIGITS
+if [ ! -f $PATH_TO_PYTHON ] || [ $SHALL_REBUILD ]; then
     echo 'Building python in directory ./Python-'$PYTHON_VERSION
     cd './Python-'$PYTHON_VERSION
     pwd
@@ -253,7 +256,7 @@ fi
 cd
 echo 'Building numpy:'
 cd python-numpy-snapshot
-$PATH_TO_PYTHON setup.py build
+sudo $PATH_TO_PYTHON setup.py build
 #cd
 #sudo python3 python-numpy-snapshot/setup.py install  #<-- numpy is required for polygon -- NOTE: Not working from within the source directory?
 echo '*done*'
@@ -268,7 +271,7 @@ echo '*done*'
 cd
 echo 'Building polygon:'
 cd python-polygon
-$PATH_TO_PYTHON setup.py build
+sudo $PATH_TO_PYTHON setup.py build
 echo '*done*'
 
 
@@ -279,11 +282,13 @@ echo "======= INTEGRATE INTO BLENDER"
 # setup up symbolic links:
 cd 
 rm $PATH_TO_BLENDER_PYTHON_LIB/numpy
-ln -s $HOME/python-numpy-snapshot/numpy ./blender-source/python/lib/python3.4/
+#ln -s $HOME/python-numpy-snapshot/numpy $PATH_TO_BLENDER_PYTHON_LIB/
+ln -s $HOME/python-numpy-snapshot/build/lib.linux-$(uname -m)-$PYTHON_VERSION_2DIGITS/numpy $PATH_TO_BLENDER_PYTHON_LIB/
 echo 'Created symbolic link for numpy. (In newer version numpy already exists in site-packages thanks to Thomas (DingTo).)'
 
 rm $PATH_TO_BLENDER_PYTHON_LIB/shapely
-ln -s $HOME/python-shapely/shapely $PATH_TO_BLENDER_PYTHON_LIB/
+#ln -s $HOME/python-shapely/shapely $PATH_TO_BLENDER_PYTHON_LIB/
+ln -s $HOME/python-shapely/build/lib.linux-$(uname -m)-$PYTHON_VERSION_2DIGITS/shapely $PATH_TO_BLENDER_PYTHON_LIB/
 echo 'Created symbolic link for shapely.'
 
 rm $PATH_TO_BLENDER_PYTHON_LIB/Polygon
@@ -291,17 +296,16 @@ rm $PATH_TO_BLENDER_PYTHON_LIB/Polygon
 # Using build/.../Polygon as there cPolygon exists. Do not copy over or symlink ./Polygon instead. It will not contain compiled cPolygon. The instructions on Blendercam.blogspot.cz did not work for me.
 ln -s $HOME/python-polygon/build/lib.linux-$(uname -m)-$PYTHON_VERSION_2DIGITS/Polygon $PATH_TO_BLENDER_PYTHON_LIB/
 echo 'Created symbolic link for Polygon.'
-#
-'''
-see here for why this is not necessarily possible:
-http://blender.stackexchange.com/questions/8509/including-3rd-party-modules-in-a-blender-addon
- either
-    provide a complete, customized blender build
-	    or
-    ask your users to manually place the required lib into python/lib/pythonV.V/site-packages folder.
-	    or
-    add the lib to your addon folder and import it from there (sys.path.append should do the trick)
-'''
+#'''
+#see here for why this is not necessarily possible:
+#http://blender.stackexchange.com/questions/8509/including-3rd-party-modules-in-a-blender-addon
+# either
+#    provide a complete, customized blender build
+#	    or
+#    ask your users to manually place the required lib into python/lib/pythonV.V/site-packages folder.
+#	    or
+#    add the lib to your addon folder and import it from there (sys.path.append should do the trick)
+#'''
 # Assuming blendercam uses sys.path.append: 
 #ln -s $HOME/python-polygon/build/lib.linux-$(uname -m)-$PYTHON_VERSION_2DIGITS/Polygon $PATH_TO_BLENDER_PYTHON_LIB/site-packages/
 #echo 'Linked polygon into site-packages.'
