@@ -177,15 +177,15 @@ echo "======= INTEGRATE INTO BLENDER"
 # setup up symbolic links:
 cd 
 rm ./blender-source/python/lib/python3.4/numpy
-ln -s ./python-numpy-snapshot/numpy ./blender-source/python/lib/python3.4/
+ln -s $HOME/python-numpy-snapshot/numpy ./blender-source/python/lib/python3.4/
 echo 'Linked numpy.'
 
 rm ./blender-source/python/lib/python3.4/shapely
-ln -s ./python-shapely/shapely ./blender-source/python/lib/python3.4/
+ln -s $HOME/python-shapely/shapely ./blender-source/python/lib/python3.4/
 echo 'Linked shapely.'
 
 rm ./blender-source/python/lib/python3.4/Polygon
-ln -s ./python-polygon/Polygon ./blender-source/python/lib/python3.4/
+ln -s $HOME/python-polygon/Polygon ./blender-source/python/lib/python3.4/
 echo 'Linked polygon.'
 
 cd 
