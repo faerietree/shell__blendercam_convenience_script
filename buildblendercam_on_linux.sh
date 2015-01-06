@@ -113,6 +113,22 @@ done
 echo ""
 echo "================="
 echo "====== FETCH"
+echo 'Fetching BlenderCAM addon by hero Vilem:'
+#sudo $PACKAGE_MANAGER_INSTALL_COMMAND svn
+cd 
+PATH_TO_ADDON=BlenderCAM
+if ! [[ -d $PATH_TO_ADDON ]]; then
+	echo 'Downloading BlenderCAM addon ...'
+    svn checkout http://blendercam.googlecode.com/svn/trunk/ BlenderCAM
+	echo '*done*'
+else
+	echo 'Updating BlenderCAM addon ...'
+	cd $PATH_TO_ADDON
+	echo '*done*'
+	svn up
+fi
+
+
 # Fetch or update polygon sources:
 cd
 VERSION="3-3.0.7"
@@ -316,7 +332,7 @@ echo 'Created symbolic link for Polygon.'
 cd
 echo 'Creating symbolic link for config: '
 rm ./blender-source/config # <-- not deletes if it's a directory, thus this is safe.
-ln -s $HOME/blendercam/config blender-source/
+ln -s $HOME/$PATH_TO_ADDON/config blender-source/
 echo '*done*'
 
 # TODO iterate, i.e. treat one by one and remove existing old version first.
@@ -336,15 +352,15 @@ rm blender-source/scripts/presets/cam_operations
 echo '*done*'
 
 echo 'Copying over addons to scripts/addons/ :'
-rsync -vaz --exclude=".*" $HOME/blendercam/scripts/addons/* blender-source/scripts/addons/
-#cp -r $HOME/blendercam/scripts/addons/* blender-source/scripts/addons/
-#ln -s $HOME/blendercam/scripts/addons/* blender-source/scripts/addons/
+rsync -vaz --exclude=".*" $HOME/$PATH_TO_ADDON/scripts/addons/* blender-source/scripts/addons/
+#cp -r $HOME/$PATH_TO_ADDON/scripts/addons/* blender-source/scripts/addons/
+#ln -s $HOME/$PATH_TO_ADDON/scripts/addons/* blender-source/scripts/addons/
 echo '*done*'
 echo 'Copying blenderCAM presets over to blender scripts/presets/.'
-rsync -vaz --exclude=".*" $HOME/blendercam/scripts/presets/* blender-source/scripts/presets/
-#cp -r $HOME/blendercam/scripts/presets/* blender-source/scripts/presets/
+rsync -vaz --exclude=".*" $HOME/$PATH_TO_ADDON/scripts/presets/* blender-source/scripts/presets/
+#cp -r $HOME/$PATH_TO_ADDON/scripts/presets/* blender-source/scripts/presets/
 echo '*done*'
-#ln -s $HOME/blendercam/scripts/presets/* blender-source/scripts/presets/
+#ln -s $HOME/$PATH_TO_ADDON/scripts/presets/* blender-source/scripts/presets/
 
 # LAUNCH BLENDER
 echo ""
