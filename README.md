@@ -17,18 +17,18 @@ Note: BlenderCAM tries to enable these automatically but it may fail.
 
 Setup:
 ---
-[B]WARNING:[/B] DON'T USE YOUR ART BLENDER SETUP FOR THIS! DOWNLOAD ANOTHER ONE OR COPY THE EXISTING BLENDER FOLDER. (Because we automatically copy over a new config, better to be safe.)
+WARNING: DON'T USE YOUR ART BLENDER SETUP FOR THIS! DOWNLOAD ANOTHER ONE OR COPY THE EXISTING BLENDER FOLDER. (Because a new config is copied automatically to the blender in the folder blender-srouce. Better to be safe!)
 
 
 ### Download Script:
 
     cd
-    git clone https://github.com/faerietree/blendercam.git[/code]
+    git clone https://github.com/faerietree/blendercam.git
 
 OR (quicker)
 
-    [code]cd
-    git clone git@github.com:faerietree/blendercam.git[/code]
+    cd
+    git clone git@github.com:faerietree/blendercam.git
 
 
 
