@@ -1,9 +1,76 @@
-#!/bin/sh
+#!/bin/bash
 
 # PREREQUISITES:
 # Set the corresponding symbolic link for blender: (blender must exist in $HOME directory)
 #ln -s ./blender-2.73-rc1-linux-glibc211-x86_64/blender blender
 #ln -s ./blender-2.73-rc1-linux-glibc211-x86_64/2.73 blender-source
+
+
+echo "================="
+echo "====== INPUT"
+#echo $#
+SHALL_REDOWNLOAD=1
+SHALL_INSTALL_PACKAGES=false
+PACKAGE_MANAGER_INSTALL_COMMAND=' apt-get ' #because it's available most often?
+
+# Parse the arguments given to this script:
+#for i # <- for each  argument, terminate if no more arguments, see below
+while :
+do
+    echo $1 #use $i
+    # Note: Empty space is the delimiter! => $1 is first, after space is $2.
+    case $1 in
+        -h | --help | -\?)
+            #TODO create help function to call?
+			echo "Use like /path/to/buildblendercam_on_linux.sh --no-redownload --install_missing[_packages] --yaourt --yum --pacman --apt-get --aptitude --package_manager_install_command=' pacman -Sa '"
+            exit 0    # This is not an error, User asked for help. Don't "exit 1"
+            ;;
+			
+        --no-redownload)
+            SHALL_REDOWNLOAD=0
+	        shift
+            ;;
+			
+        --package_manager_install_command=*)
+			PACKAGE_MANAGER_INSTALL_COMMAND=${1#*=}
+	        shift 1
+            ;;
+			
+        --install_missing*)
+            SHALL_INSTALL_PACKAGES=true
+	        shift
+            ;;
+			
+		--apt-get)
+			PACKAGE_MANAGER_INSTALL_COMMAND=' apt-get install '
+	        shift
+            ;;
+		--aptitude)
+			PACKAGE_MANAGER_INSTALL_COMMAND=' aptitude install '
+	        shift
+            ;;
+		--pacman)
+			PACKAGE_MANAGER_INSTALL_COMMAND=' pacman -S install '
+	        shift
+            ;;
+		--yaourt)
+			PACKAGE_MANAGER_INSTALL_COMMAND=' yaourt -Sa '
+	        shift
+			;;
+		'--yum')
+			PACKAGE_MANAGER_INSTALL_COMMAND=' yum install '
+	        shift
+            ;;
+		
+		--prefix=*)
+            AD=${1#*=}    # Deletes everything before first occurrence of = (inclusively).
+            shift
+			;;
+        *)  # no more options. Stop while loop. #<-- Note: This must be the last check condition as it matches always.
+            break
+            ;;
+	esac
+done
 
 
 # FETCH
@@ -59,13 +126,19 @@ else
 	git pull
 	cd
 fi
-rm numpy.tar.gz # <-- because it may be a broken/incomplete download.
+
+if [ -f numpy.tar.gz ] && [ $SHALL_REDOWNLOAD -ne 0 ]; then
+	echo 'Removing previously downloaded numpy.tar.gz :'
+	rm numpy.tar.gz # <-- because it may be a broken/incomplete download.
+fi
 VERSION="1.9.1"
+# -ne and -eq for integer
 if ! [[ -f numpy.tar.gz ]]; then
 	echo "Downloading numpy sources: "
 	wget "http://sourceforge.net/projects/numpy/files/NumPy/$VERSION/numpy-$VERSION"".tar.gz/download?use_mirror=skylink&r=http%3A%2F%2Fsourceforge.net%2Fprojects%2Fnumpy%2Ffiles%2FNumPy%2F1.9.1%2F&use_mirror=skylink" -O numpy.tar.gz
 fi
 tar xzf numpy.tar.gz --directory .
+sudo rm python-numpy-snapshot -r
 mv "numpy-"$VERSION python-numpy-snapshot #overwrites!
 echo '-----------------'
 	
@@ -74,16 +147,18 @@ echo '-----------------'
 # BUILD
 echo "================="
 echo "====== BUILD"
-#sudo aptitude install python-dev
-#which python
-#python --version
-echo "Installing additional packages if not exist: python3-dev, cython, libgeos-dev:"
-sudo aptitude install python3-dev
-which python3
-python3 --version
 
-sudo aptitude install cython
-sudo aptitude install libgeos-dev
+if [[ $SHALL_INSTALL_PACKAGES ]]; then
+	echo "Installing additional packages if not exist: python3-dev, cython, libgeos-dev:"
+    #sudo aptitude install python-dev
+    #which python
+    #python --version
+    sudo $PACKAGE_MANAGER_INSTALL_COMMAND python3-dev
+    which python3
+    python3 --version
+    sudo $PACKAGE_MANAGER_INSTALL_COMMAND cython
+    sudo $PACKAGE_MANAGER_INSTALL_COMMAND libgeos-dev
+fi
 
 cd
 cd python-polygon
@@ -120,11 +195,26 @@ ln -s $HOME/blendercam/config blender-source/
 echo "-------------------------------------------"
 echo "Note: Failures are normal if the addons already exist. Coding TODO check individually and either skip if exists or replace with newer version."
 echo "-------------------------------------------"
-cp -r -i $HOME/blendercam/scripts/addons/* blender-source/scripts/addons/
-echo 'Copied over addons to scripts/addons/.'
+echo 'Cleaning previously linked(older script version) or copied over addons (files only!):'
+rm blender-source/scripts/addons/cam
+rm blender-source/scripts/addons/print_3d
+rm blender-source/scripts/addons/scan_tools.py
+rm blender-source/scripts/addons/select_similar.py
+echo '*done*'
+
+echo 'Cleaning previously linked(older script version) or copied over presets (files only!):'
+rm blender-source/scripts/presets/cam_cutters
+rm blender-source/scripts/presets/cam_machines
+rm blender-source/scripts/presets/cam_operations
+echo '*done*'
+
+echo 'Copying over addons to scripts/addons/ :'
+cp -r $HOME/blendercam/scripts/addons/* blender-source/scripts/addons/
 #ln -s $HOME/blendercam/scripts/addons/* blender-source/scripts/addons/
-cp -r -i $HOME/blendercam/scripts/presets/* blender-source/scripts/presets/
-echo 'Copied blenderCAM presets over to blender scripts/presets/.'
+echo '*done*'
+echo 'Copying blenderCAM presets over to blender scripts/presets/.'
+cp -r $HOME/blendercam/scripts/presets/* blender-source/scripts/presets/
+echo '*done*'
 #ln -s $HOME/blendercam/scripts/presets/* blender-source/scripts/presets/
 
 # LAUNCH BLENDER
