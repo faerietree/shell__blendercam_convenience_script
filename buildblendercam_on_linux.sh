@@ -7,11 +7,7 @@
 
 
 echo "================="
-echo "====== INPUT"
-#echo $#
-SHALL_REDOWNLOAD=1
-SHALL_INSTALL_PACKAGES=false
-PACKAGE_MANAGER_INSTALL_COMMAND=' apt-get install ' #because it's available most often?
+echo "====== AUTODETECT"
 PATH_TO_PYTHON=python3
 #PATH_TO_PYTHON='$HOME/blender-source/../lib/python'
 PYTHON_VERSION_2DIGITS=3.4
@@ -22,6 +18,14 @@ echo "Python version: "$PYTHON_VERSION_2DIGITS
 PATH_TO_BLENDER_PYTHON_LIB=$PATH_TO_BLENDER_PYTHON_LIB"/python"$PYTHON_VERSION_2DIGITS
 echo "Python library path (blender bundled python):" $PATH_TO_BLENDER_PYTHON_LIB
 
+
+echo ""
+echo "================="
+echo "====== INPUT"
+#echo $#
+SHALL_REDOWNLOAD=1
+SHALL_INSTALL_PACKAGES=false
+PACKAGE_MANAGER_INSTALL_COMMAND=' apt-get install ' #because it's available most often?
 
 
 # Parse the arguments given to this script:
@@ -100,6 +104,7 @@ done
 
 
 # FETCH
+echo ""
 echo "================="
 echo "====== FETCH"
 # Fetch or update polygon sources:
@@ -176,6 +181,7 @@ echo '-----------------'
 
 
 # BUILD
+echo ""
 echo "================="
 echo "====== BUILD"
 
@@ -199,17 +205,23 @@ if [[ $SHALL_INSTALL_PACKAGES ]]; then
 	fi
 	echo '*done*'
 	
-	echo 'Downloading python in version '$PYTHON_VERSION_2DIGITS'.0:'
-	wget https://www.python.org/ftp/python/3.4.0/Python-3.4.0.tgz  -O python.tgz
+	PYTHON_VERSION=$PYTHON_VERSION_2DIGITS'.0'
+	echo 'Downloading python in version '$PYTHON_VERSION':'
+	wget https://www.python.org/ftp/python/$PYTHON_VERSION/Python-$PYTHON_VERSION.tgz  -O python.tgz
 	echo 'Unpacking ...'
 	tar xzf python.tgz
 	echo '*done*'
 	
-	echo 'Building python: '
-	PATH_TO_ALTINSTALL=$HOME/blendercamlib/
-	# TODO
+	echo 'Building python in directory ./Python-'$PYTHON_VERSION
+	cd './Python-'$PYTHON_VERSION
+	PATH_TO_ALTINSTALL=$HOME/lib/
+	echo 'Using prefix:'$PATH_TO_ALTINSTALL
+	ls
+	./configure --prefix=$PATH_TO_ALTINSTALL
+	make
+	#make altinstall
 	echo 'Using python altinstall binary '$PATH_TO_ALTINSTALL'.'
-	PATH_TO_PYTHON=$PATH_TO_ALTINSTALL
+	PATH_TO_PYTHON=$PATH_TO_ALTINSTALL'/python'
 fi
 
 
@@ -237,23 +249,25 @@ echo '*done*'
 
 
 # INTEGRATE BLENDERCAM INTO BLENDER
+echo ""
 echo "================="
 echo "======= INTEGRATE INTO BLENDER"
 # setup up symbolic links:
 cd 
 rm $PATH_TO_BLENDER_PYTHON_LIB/numpy
 ln -s $HOME/python-numpy-snapshot/numpy ./blender-source/python/lib/python3.4/
-echo 'Linked numpy.'
+echo 'Created symbolic link for numpy. (In newer version numpy already exists in site-packages thanks to Thomas (DingTo).)'
 
 rm $PATH_TO_BLENDER_PYTHON_LIB/shapely
 ln -s $HOME/python-shapely/shapely $PATH_TO_BLENDER_PYTHON_LIB/
-echo 'Linked shapely.'
+echo 'Created symbolic link for shapely.'
 
 rm $PATH_TO_BLENDER_PYTHON_LIB/Polygon
 #ln -s $HOME/python-polygon/Polygon ./blender-source/python/lib/python3.4/
-echo 'Using build/.../Polygon as there cPolygon exists. Do not copy over or symlink ./Polygon instead. It will not contain compiled cPolygon. The instructions on Blendercam.blogspot.cz did not work for me.'
+# Using build/.../Polygon as there cPolygon exists. Do not copy over or symlink ./Polygon instead. It will not contain compiled cPolygon. The instructions on Blendercam.blogspot.cz did not work for me.
 ln -s $HOME/python-polygon/build/lib.linux-$(uname -m)-$PYTHON_VERSION_2DIGITS/Polygon $PATH_TO_BLENDER_PYTHON_LIB/
-echo 'Linked polygon.'
+echo 'Created symbolic link for Polygon.'
+#
 '''
 see here for why this is not necessarily possible:
 http://blender.stackexchange.com/questions/8509/including-3rd-party-modules-in-a-blender-addon
@@ -268,16 +282,16 @@ http://blender.stackexchange.com/questions/8509/including-3rd-party-modules-in-a
 #ln -s $HOME/python-polygon/build/lib.linux-$(uname -m)-$PYTHON_VERSION_2DIGITS/Polygon $PATH_TO_BLENDER_PYTHON_LIB/site-packages/
 #echo 'Linked polygon into site-packages.'
 #ln -s $HOME/python-polygon/build/lib.linux-$(uname -m)-3.2/Polygon/*.so ./blender-source/../lib/
-ln -s $HOME/python-polygon/build/lib.linux-$(uname -m)-$PYTHON_VERSION_2DIGITS/Polygon $PATH_TO_BLENDER_PYTHON_LIB/site-packages/
+#ln -s $HOME/python-polygon/build/lib.linux-$(uname -m)-$PYTHON_VERSION_2DIGITS/Polygon $PATH_TO_BLENDER_PYTHON_LIB/site-packages/
 #echo 'Linked shared objects to blenderxyz/lib/ (e.g. cPolygon.so).'
-echo 'Static object in lib/ should now provide: cPolygon.o  gpc.o  PolyUtil.o'
 
-cd 
+cd
+echo 'Creating symbolic link for config: '
 rm ./blender-source/config # <-- not deletes if it's a directory, thus this is safe.
 ln -s $HOME/blendercam/config blender-source/
+echo '*done*'
+
 # TODO iterate, i.e. treat one by one and remove existing old version first.
-echo "-------------------------------------------"
-echo "Note: Failures are normal if the addons already exist. Coding TODO check individually and either skip if exists or replace with newer version."
 echo "-------------------------------------------"
 echo 'Cleaning previously linked(older script version) or copied over addons (files only!):'
 rm blender-source/scripts/addons/cam
@@ -304,6 +318,7 @@ echo '*done*'
 #ln -s $HOME/blendercam/scripts/presets/* blender-source/scripts/presets/
 
 # LAUNCH BLENDER
+echo ""
 echo "================="
 echo "======= LAUNCH "
 cd
