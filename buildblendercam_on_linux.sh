@@ -268,7 +268,7 @@ echo '*done*'
 cd
 echo 'Building polygon:'
 cd python-polygon
-$PATH_TO_PYTHON 3setup.py build
+$PATH_TO_PYTHON setup.py build
 echo '*done*'
 
 
