@@ -11,7 +11,7 @@ echo "====== INPUT"
 #echo $#
 SHALL_REDOWNLOAD=1
 SHALL_INSTALL_PACKAGES=false
-PACKAGE_MANAGER_INSTALL_COMMAND=' apt-get ' #because it's available most often?
+PACKAGE_MANAGER_INSTALL_COMMAND=' apt-get install ' #because it's available most often?
 
 # Parse the arguments given to this script:
 #for i # <- for each  argument, terminate if no more arguments, see below
@@ -36,16 +36,12 @@ do
 	        shift 1
             ;;
 			
-        --install_missing*)
-            SHALL_INSTALL_PACKAGES=true
-	        shift
-            ;;
-			
 		--apt-get)
 			PACKAGE_MANAGER_INSTALL_COMMAND=' apt-get install '
 	        shift
             ;;
 		--aptitude)
+			echo 'Using aptitude ...'
 			PACKAGE_MANAGER_INSTALL_COMMAND=' aptitude install '
 	        shift
             ;;
@@ -57,8 +53,12 @@ do
 			PACKAGE_MANAGER_INSTALL_COMMAND=' yaourt -Sa '
 	        shift
 			;;
-		'--yum')
+		--yum)
 			PACKAGE_MANAGER_INSTALL_COMMAND=' yum install '
+	        shift
+            ;;
+        --install_missing*)
+            SHALL_INSTALL_PACKAGES=true
 	        shift
             ;;
 		
@@ -66,6 +66,7 @@ do
             AD=${1#*=}    # Deletes everything before first occurrence of = (inclusively).
             shift
 			;;
+			
         *)  # no more options. Stop while loop. #<-- Note: This must be the last check condition as it matches always.
             break
             ;;
@@ -150,25 +151,37 @@ echo "====== BUILD"
 
 if [[ $SHALL_INSTALL_PACKAGES ]]; then
 	echo "Installing additional packages if not exist: python3-dev, cython, libgeos-dev:"
+    sudo $PACKAGE_MANAGER_INSTALL_COMMAND cython
+    sudo $PACKAGE_MANAGER_INSTALL_COMMAND libgeos-dev
     #sudo aptitude install python-dev
     #which python
     #python --version
+	echo $PACKAGE_MANAGER_INSTALL_COMMAND
     sudo $PACKAGE_MANAGER_INSTALL_COMMAND python3-dev
+    sudo $PACKAGE_MANAGER_INSTALL_COMMAND python3-numpy
     which python3
     python3 --version
-    sudo $PACKAGE_MANAGER_INSTALL_COMMAND cython
-    sudo $PACKAGE_MANAGER_INSTALL_COMMAND libgeos-dev
 fi
 
 cd
-cd python-polygon
-sudo python3 setup.py build
-cd
+echo 'Building numpy:'
 cd python-numpy-snapshot
 sudo python3 setup.py build
+#sudo python3 setup.py install  #<-- numpy is required for polygon
+echo '*done*'
+
 cd 
+echo 'Building shapely:'
 cd python-shapely
 sudo python3 setup.py build
+#sudo python3 setup.py install
+echo '*done*'
+
+cd
+echo 'Building polygon:'
+cd python-polygon
+python3 setup.py build
+echo '*done*'
 
 
 # INTEGRATE BLENDERCAM INTO BLENDER

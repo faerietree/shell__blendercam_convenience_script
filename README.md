@@ -29,7 +29,7 @@ Usage:
         ~/path/to/buildblendercam_on_linux.sh
 Expert mode:
 
-        ~/path/to/buildblendercam_on_linux.sh --no-redownload --install-missing-packages --aptitude -yaourt --package-manager-install-command='yum install'
+        ~/path/to/buildblendercam_on_linux.sh --no-redownload --install-missing-packages --aptitude --yaourt --package-manager-install-command='yum install'
 
 
 * Follow the progress of the script, it may need input.
