@@ -11,6 +11,7 @@ Note: It may be that the current blenderCAM addon is not yet compatible with the
 Blender Addon Prerequisites:
 ------
 * Simplify Curves (curve_simplify)
+"After first start everything should be set up. If you don't see CAM tabs on the right side, go to preferences-addons and enable the Simplify curves addon and CAM addon. Also, if Blender CAM tabs don't show, change Blender Render to  Blender CAM [or print_3d] in the upper header." (Vilem Novak, BlenderCAM creator)
 
 Usage:
 ---

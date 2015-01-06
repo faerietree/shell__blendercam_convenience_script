@@ -14,6 +14,15 @@ SHALL_INSTALL_PACKAGES=false
 PACKAGE_MANAGER_INSTALL_COMMAND=' apt-get install ' #because it's available most often?
 PATH_TO_PYTHON=python3
 #PATH_TO_PYTHON='$HOME/blender-source/../lib/python'
+PYTHON_VERSION_2DIGITS=3.4
+# Derive Python version from blender source:
+PATH_TO_BLENDER_PYTHON_LIB=$HOME/blender-source/python/lib
+PYTHON_VERSION_2DIGITS=$(ls $PATH_TO_BLENDER_PYTHON_LIB | egrep -o '[0-9]+[.][[:digit:]]+' | head -n1)
+echo "Python version: "$PYTHON_VERSION_2DIGITS
+PATH_TO_BLENDER_PYTHON_LIB=$PATH_TO_BLENDER_PYTHON_LIB"/python"$PYTHON_VERSION_2DIGITS
+echo "Python library path (blender bundled python):" $PATH_TO_BLENDER_PYTHON_LIB
+
+
 
 # Parse the arguments given to this script:
 #for i # <- for each  argument, terminate if no more arguments, see below
@@ -178,11 +187,32 @@ if [[ $SHALL_INSTALL_PACKAGES ]]; then
     #which python
     #python --version
 	echo $PACKAGE_MANAGER_INSTALL_COMMAND
-    sudo $PACKAGE_MANAGER_INSTALL_COMMAND python3-dev
-    sudo $PACKAGE_MANAGER_INSTALL_COMMAND python3-numpy
+	echo 'As it is not guarantueed that the python3 version in the package repositories match the blender version: '$PYTHON_VERSION_2DIGITS'. We will custom download and (alt)install the correct version.'
+#    sudo $PACKAGE_MANAGER_INSTALL_COMMAND python3-dev python3-devel
+#    sudo $PACKAGE_MANAGER_INSTALL_COMMAND python3-numpy
     which python3
     python3 --version
+	echo 'Deleting previously downloaded python (it may be broken so redownload to be safe):'
+	cd
+	if [ -f python.tgz ]; then
+		rm python.tgz
+	fi
+	echo '*done*'
+	
+	echo 'Downloading python in version '$PYTHON_VERSION_2DIGITS'.0:'
+	wget https://www.python.org/ftp/python/3.4.0/Python-3.4.0.tgz  -O python.tgz
+	echo 'Unpacking ...'
+	tar xzf python.tgz
+	echo '*done*'
+	
+	echo 'Building python: '
+	PATH_TO_ALTINSTALL=$HOME/blendercamlib/
+	# TODO
+	echo 'Using python altinstall binary '$PATH_TO_ALTINSTALL'.'
+	PATH_TO_PYTHON=$PATH_TO_ALTINSTALL
 fi
+
+
 
 cd
 echo 'Building numpy:'
@@ -211,22 +241,35 @@ echo "================="
 echo "======= INTEGRATE INTO BLENDER"
 # setup up symbolic links:
 cd 
-rm ./blender-source/python/lib/python3.4/numpy
+rm $PATH_TO_BLENDER_PYTHON_LIB/numpy
 ln -s $HOME/python-numpy-snapshot/numpy ./blender-source/python/lib/python3.4/
 echo 'Linked numpy.'
 
-rm ./blender-source/python/lib/python3.4/shapely
-ln -s $HOME/python-shapely/shapely ./blender-source/python/lib/python3.4/
+rm $PATH_TO_BLENDER_PYTHON_LIB/shapely
+ln -s $HOME/python-shapely/shapely $PATH_TO_BLENDER_PYTHON_LIB/
 echo 'Linked shapely.'
 
-rm ./blender-source/python/lib/python3.4/Polygon
+rm $PATH_TO_BLENDER_PYTHON_LIB/Polygon
 #ln -s $HOME/python-polygon/Polygon ./blender-source/python/lib/python3.4/
 echo 'Using build/.../Polygon as there cPolygon exists. Do not copy over or symlink ./Polygon instead. It will not contain compiled cPolygon. The instructions on Blendercam.blogspot.cz did not work for me.'
-ln -s "$HOME/python-polygon/build/lib.linux-$(uname -m)-3.2/Polygon" ./blender-source/python/lib/python3.4/
-python-polygon/build/lib.linux-x86_64-3.2/Polygon/
+ln -s $HOME/python-polygon/build/lib.linux-$(uname -m)-$PYTHON_VERSION_2DIGITS/Polygon $PATH_TO_BLENDER_PYTHON_LIB/
 echo 'Linked polygon.'
-ln -s $HOME/python-polygon/build/lib.linux-$(uname -m)-3.2/Polygon/*.so ./blender-source/../lib/
-echo 'Linked static objects to blenderxyz/lib/ (e.g. cPolygon.so).'
+'''
+see here for why this is not necessarily possible:
+http://blender.stackexchange.com/questions/8509/including-3rd-party-modules-in-a-blender-addon
+ either
+    provide a complete, customized blender build
+	    or
+    ask your users to manually place the required lib into python/lib/pythonV.V/site-packages folder.
+	    or
+    add the lib to your addon folder and import it from there (sys.path.append should do the trick)
+'''
+# Assuming blendercam uses sys.path.append: 
+#ln -s $HOME/python-polygon/build/lib.linux-$(uname -m)-$PYTHON_VERSION_2DIGITS/Polygon $PATH_TO_BLENDER_PYTHON_LIB/site-packages/
+#echo 'Linked polygon into site-packages.'
+#ln -s $HOME/python-polygon/build/lib.linux-$(uname -m)-3.2/Polygon/*.so ./blender-source/../lib/
+ln -s $HOME/python-polygon/build/lib.linux-$(uname -m)-$PYTHON_VERSION_2DIGITS/Polygon $PATH_TO_BLENDER_PYTHON_LIB/site-packages/
+#echo 'Linked shared objects to blenderxyz/lib/ (e.g. cPolygon.so).'
 echo 'Static object in lib/ should now provide: cPolygon.o  gpc.o  PolyUtil.o'
 
 cd 
