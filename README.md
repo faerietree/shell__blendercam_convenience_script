@@ -12,7 +12,8 @@ Blender Addon Prerequisites:
 ------
 Note: BlenderCAM tries to enable these automatically but it may fail.
 * Simplify Curves (curve_simplify).
-"After first start everything should be set up. If you don't see CAM tabs on the right side, go to preferences-addons and enable the Simplify curves addon and CAM addon. Also, if Blender CAM tabs don't show, change Blender Render to  Blender CAM [or print_3d] in the upper header." (Vilem Novak, BlenderCAM creator)
+
+''"After first start everything should be set up. If you don't see CAM tabs on the right side, go to preferences-addons and enable the Simplify curves addon and CAM addon. Also, if Blender CAM tabs don't show, change Blender Render to  Blender CAM [or print_3d] in the upper header." (Vilem Novak, BlenderCAM creator)''
 
 
 Setup:
@@ -54,17 +55,20 @@ Usage:
 
         /path/to/buildblendercam_on_linux.sh
 
-For example:
+    For example:
+
         ~/blendercam/buildblendercam_on_linux.sh
 
-For testing use, if you know the downloads are intact/not broken:
+    For testing use, if you know the downloads are intact/not broken:
+
         ~/blendercam/buildblendercam_on_linux.sh --no-redownload
 
-Force rebuild of the matching python using:
+    Force rebuild of the matching python using:
+
         ~/blendercam/buildblendercam_on_linux.sh --rebuild
 
 
-Expert mode:
+    Expert mode:
 
         ~/path/to/buildblendercam_on_linux.sh --no-redownload --rebuild-python --install-missing-packages --aptitude --yaourt --package-manager-install-command='yum install'
 
