@@ -209,11 +209,13 @@ rm blender-source/scripts/presets/cam_operations
 echo '*done*'
 
 echo 'Copying over addons to scripts/addons/ :'
-cp -r $HOME/blendercam/scripts/addons/* blender-source/scripts/addons/
+rsync -vaz --exclude=".*" $HOME/blendercam/scripts/addons/* blender-source/scripts/addons/
+#cp -r $HOME/blendercam/scripts/addons/* blender-source/scripts/addons/
 #ln -s $HOME/blendercam/scripts/addons/* blender-source/scripts/addons/
 echo '*done*'
 echo 'Copying blenderCAM presets over to blender scripts/presets/.'
-cp -r $HOME/blendercam/scripts/presets/* blender-source/scripts/presets/
+rsync -vaz --exclude=".*" $HOME/blendercam/scripts/presets/* blender-source/scripts/presets/
+#cp -r $HOME/blendercam/scripts/presets/* blender-source/scripts/presets/
 echo '*done*'
 #ln -s $HOME/blendercam/scripts/presets/* blender-source/scripts/presets/
 
