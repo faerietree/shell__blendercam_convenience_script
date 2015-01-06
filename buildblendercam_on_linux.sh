@@ -12,6 +12,8 @@ echo "====== INPUT"
 SHALL_REDOWNLOAD=1
 SHALL_INSTALL_PACKAGES=false
 PACKAGE_MANAGER_INSTALL_COMMAND=' apt-get install ' #because it's available most often?
+PATH_TO_PYTHON=python3
+#PATH_TO_PYTHON='$HOME/blender-source/../lib/python'
 
 # Parse the arguments given to this script:
 #for i # <- for each  argument, terminate if no more arguments, see below
@@ -41,7 +43,6 @@ do
 	        shift
             ;;
 		--aptitude)
-			echo 'Using aptitude ...'
 			PACKAGE_MANAGER_INSTALL_COMMAND=' aptitude install '
 	        shift
             ;;
@@ -57,7 +58,7 @@ do
 			PACKAGE_MANAGER_INSTALL_COMMAND=' yum install '
 	        shift
             ;;
-        --install_missing*)
+        --install_missing* | --install-missing*)
             SHALL_INSTALL_PACKAGES=true
 	        shift
             ;;
@@ -66,6 +67,21 @@ do
             AD=${1#*=}    # Deletes everything before first occurrence of = (inclusively).
             shift
 			;;
+			
+        -v | --verbose)
+            # Each instance of -v adds 1 to verbosity
+            verbose=$((verbose+1))
+            shift
+            ;;
+        --) # End of all options
+            shift
+            break
+            ;;
+        -*)
+            printf >&2 'WARN: Unknown option (ignored): %s\n' "$1"
+            shift
+            ;;
+
 			
         *)  # no more options. Stop while loop. #<-- Note: This must be the last check condition as it matches always.
             break
@@ -89,12 +105,16 @@ fi
 DIR="Polygon"$VERSION
 # exists and is directory?
 if ! [[ -d $DIR ]]; then
+	echo 'Found no '$DIR'. Fetching it: '
 	wget "https://pypi.python.org/packages/source/P/Polygon3/$FILE" -O Polygon3.zip
+	echo 'Unzipping: '
 	unzip Polygon3.zip
+	echo '*done*'
 	rm Polygon3.zip
 fi
 rm python-polygon
 ln -s "$DIR/" python-polygon
+echo "Linked $DIR to python-polygon."
 echo '-----------------'
 
 # fetch or update shapely source repository
@@ -166,21 +186,22 @@ fi
 cd
 echo 'Building numpy:'
 cd python-numpy-snapshot
-sudo python3 setup.py build
-#sudo python3 setup.py install  #<-- numpy is required for polygon
+$PATH_TO_PYTHON setup.py build
+#cd
+#sudo python3 python-numpy-snapshot/setup.py install  #<-- numpy is required for polygon -- NOTE: Not working from within the source directory?
 echo '*done*'
 
 cd 
 echo 'Building shapely:'
 cd python-shapely
-sudo python3 setup.py build
+sudo $PATH_TO_PYTHON setup.py build
 #sudo python3 setup.py install
 echo '*done*'
 
 cd
 echo 'Building polygon:'
 cd python-polygon
-python3 setup.py build
+$PATH_TO_PYTHON 3setup.py build
 echo '*done*'
 
 
