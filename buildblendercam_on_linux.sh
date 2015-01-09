@@ -125,7 +125,7 @@ done
 echo ""
 echo "================="
 echo "====== FETCH"
-echo 'Fetching BlenderCAM addon by hero Vilem:'
+echo 'Fetching or updating BlenderCAM addon by hero Vilem:'
 #sudo $PACKAGE_MANAGER_INSTALL_COMMAND svn
 cd 
 PATH_TO_BLENDERCAM_ADDON=$HOME/BlenderCAM
@@ -345,7 +345,7 @@ cd
 echo 'Creating symbolic link for config: '
 PATH_TO_BLENDER_CONFIG=$PATH_TO_BLENDER_RELEASE/config
 if [ -d $PATH_TO_BLENDER_CONFIG ]; then
-	PATH_TO_BLENDER_CONFIG_BACKUP=$PATH_TO_BLENDER_CONFIG $PATH_TO_BLENDER_CONFIG'.bak'
+	PATH_TO_BLENDER_CONFIG_BACKUP=$PATH_TO_BLENDER_CONFIG'.bak'
 	echo 'Warning: config directory already exists. Backing up to '
 	mv -i $PATH_TO_BLENDER_CONFIG $PATH_TO_BLENDER_CONFIG_BACKUP
 elif [ -f $PATH_TO_BLENDER_CONFIG ]; then
@@ -371,16 +371,27 @@ rm $PATH_TO_BLENDER_RELEASE/scripts/presets/cam_machines
 rm $PATH_TO_BLENDER_RELEASE/scripts/presets/cam_operations
 echo '*done*'
 
-echo 'Copying over addons to scripts/addons/ :'
-rsync -vaz --exclude=".*" $PATH_TO_BLENDERCAM_ADDON/scripts/addons/* $PATH_TO_BLENDER_RELEASE/scripts/addons/
+#echo 'Copying over blenderCAM addons to scripts/addons/ :'
+echo 'Linking blenderCAM addons to scripts/addons/ :'
+#rsync -vaz --exclude=".*" $PATH_TO_BLENDERCAM_ADDON/scripts/addons/* $PATH_TO_BLENDER_RELEASE/scripts/addons/
 #cp -r $PATH_TO_BLENDERCAM_ADDON/scripts/addons/* $PATH_TO_BLENDER_RELEASE/scripts/addons/
-#ln -s $PATH_TO_BLENDERCAM_ADDON/scripts/addons/* $PATH_TO_BLENDER_RELEASE/scripts/addons/
+ln -s $PATH_TO_BLENDERCAM_ADDON/scripts/addons/* $PATH_TO_BLENDER_RELEASE/scripts/addons
+#if [ -d $HOME/addons__only_put_here_links ]; then
+#	echo 'For optional completeness also linking them into the folder for gathering all addons.'
+#    ln -s $PATH_TO_BLENDERCAM_ADDON/scripts/addons/* $HOME/addons__only_put_here_links/
+#fi
 echo '*done*'
-echo 'Copying blenderCAM presets over to blender scripts/presets/.'
-rsync -vaz --exclude=".*" $HOME/$PATH_TO_BLENDERCAM_ADDON/scripts/presets/* $PATH_TO_BLENDER_RELEASE/scripts/presets/
+#echo 'Copying blenderCAM presets over to blender scripts/presets/.'
+echo 'Linking blenderCAM presets to blender scripts/presets/.'
+#rsync -vaz --exclude=".*" $PATH_TO_BLENDERCAM_ADDON/scripts/presets/* $PATH_TO_BLENDER_RELEASE/scripts/presets/
 #cp -r $PATH_TO_BLENDERCAM_ADDON/scripts/presets/* $PATH_TO_BLENDER_RELEASE/scripts/presets/
+ln -s $PATH_TO_BLENDERCAM_ADDON/scripts/presets/* $PATH_TO_BLENDER_RELEASE/scripts/presets
 echo '*done*'
-#ln -s $PATH_TO_BLENDERCAM_ADDON/scripts/presets/* $PATH_TO_BLENDER_RELEASE/scripts/presets/
+
+echo 'Removing __pycache__:'
+rm $PATH_TO_BLENDER_RELEASE/scripts/addons/__pycache__ -r
+echo '*done*'
+
 
 # LAUNCH BLENDER
 echo ""
