@@ -11,9 +11,9 @@ PATH_TO_PYTHON=python3
 #PATH_TO_PYTHON='$HOME/blendercam/../lib/python'
 PYTHON_VERSION_2DIGITS=3.4
 
-if [ -z $PATH_TO_BLENDER_RELEASE ]; then
+if [ ! -z $PATH_TO_BLENDER_RELEASE ]; then
 	echo 'Using user provided blender release: '$PATH_TO_BLENDER_RELEASE
-elif [ -z $BLENDER_RELEASE_PATH ]; then
+elif [ ! -z $BLENDER_RELEASE_PATH ]; then
 	echo 'Using user provided blender release: '$BLENDER_RELEASE_PATH
 	PATH_TO_BLENDER_RELEASE=$BLENDER_RELEASE_PATH
 else
