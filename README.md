@@ -6,14 +6,15 @@ Thanks to our hero Vilem Novak for making blender engineers happy!
 Download, update, library build, setup convenience script.
 -----
 
-Note: It may be that the current blenderCAM addon is not yet compatible with the newest blender!
+Note: It may be that the current blenderCAM addon is not yet compatible with the newest blender! It was compatible with the rc1 of 2.73.
+Important: Make sure that the link in the `BLENDER_RELEASE_PATH` points to `blenderfiles/2.xy/` and not just to `blenderfiles/`.
 
 Blender Addon Prerequisites:
 ------
 Note: BlenderCAM tries to enable these automatically but it may fail.
-* Simplify Curves (curve_simplify).
+* Simplify Curves (`curve_simplify`).
 
-''"After first start everything should be set up. If you don't see CAM tabs on the right side, go to preferences-addons and enable the Simplify curves addon and CAM addon. Also, if Blender CAM tabs don't show, change Blender Render to  Blender CAM [or print_3d] in the upper header." (Vilem Novak, BlenderCAM creator)''
+*"After first start everything should be set up. If you don't see CAM tabs on the right side, go to preferences-addons and enable the Simplify curves addon and CAM addon. Also, if Blender CAM tabs don't show, change Blender Render to  Blender CAM [or `print_3d`] in the upper header." (Vilem Novak, BlenderCAM creator)*
 
 
 Setup:
@@ -24,12 +25,12 @@ WARNING: DON'T USE YOUR ART BLENDER SETUP FOR THIS! DOWNLOAD ANOTHER ONE OR COPY
 ### Download Script:
 
     cd
-    git clone https://github.com/faerietree/blendercam.git
+    git clone https://github.com/faerietree/shell__blendercam_convenience_script.git
 
 OR (quicker)
 
     cd
-    git clone git@github.com:faerietree/blendercam.git
+    git clone git@github.com:faerietree/shell__blendercam_convenience_script.git
 
 
 
@@ -39,17 +40,17 @@ http://download.blender.org/release/Blender2.73/ (for example)
 
 
 ### Unpack into blender-source or create a symbolic link:
-Note: Adapt blender version to the one you donwloaded and remove rc1 if you're not using a release candidate.
+Note: Adapt blender version to the one you downloaded / copied.
 
     cd
-    ln -s $HOME/blender-2.73-rc1-linux-glibc211-x86_64/2.73 blender-source
+    ln -s ~/blender-2.73-linux-glibc211-x86_64/2.73 ~/blendercam
 
 Usage:
 ---
 
 * Make script executable (required only once):
 
-        chmod +x ~/blendercam/buildblendercam_on_linux.sh
+        chmod +x /path/to/buildblendercam_on_linux.sh
 
 * Launch this convenience script:
 
@@ -57,15 +58,15 @@ Usage:
 
     For example:
 
-        ~/blendercam/buildblendercam_on_linux.sh
+        BLENDER_RELEASE_PATH=~/blendercam ~/shell__blendercam_convenience_script/buildblendercam_on_linux.sh
 
     For testing use, if you know the downloads are intact/not broken:
 
-        ~/blendercam/buildblendercam_on_linux.sh --no-redownload
+        ~/shell__blendercam_convenience_script/buildblendercam_on_linux.sh --no-redownload
 
     Force rebuild of the matching python using:
 
-        ~/blendercam/buildblendercam_on_linux.sh --rebuild
+        ~/shell__blendercam_convenience_script/buildblendercam_on_linux.sh --rebuild
 
 
     Expert mode:
