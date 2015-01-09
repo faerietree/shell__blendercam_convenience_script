@@ -2,17 +2,28 @@
 
 # PREREQUISITES:
 # Set the corresponding symbolic link for blender: (blender must exist in $HOME directory)
-#ln -s ./blender-2.73-rc1-linux-glibc211-x86_64/blender blender
-#ln -s ./blender-2.73-rc1-linux-glibc211-x86_64/2.73 blender-source
+#ln -s ./blender-2.73-rc1-linux-glibc211-x86_64_blendercam/2.73 blendercam
 
 
 echo "================="
 echo "====== AUTODETECT"
 PATH_TO_PYTHON=python3
-#PATH_TO_PYTHON='$HOME/blender-source/../lib/python'
+#PATH_TO_PYTHON='$HOME/blendercam/../lib/python'
 PYTHON_VERSION_2DIGITS=3.4
+
+if [ -z $PATH_TO_BLENDER_RELEASE ]; then
+	echo 'Using user provided blender release: '$PATH_TO_BLENDER_RELEASE
+elif [ -z $BLENDER_RELEASE_PATH ]; then
+	echo 'Using user provided blender release: '$BLENDER_RELEASE_PATH
+	PATH_TO_BLENDER_RELEASE=$BLENDER_RELEASE_PATH
+else
+    PATH_TO_BLENDER_RELEASE=~/blendercam
+	echo 'Using default blender release location: '$PATH_TO_BLENDER_RELEASE
+fi
+
+
 # Derive Python version from blender source:
-PATH_TO_BLENDER_PYTHON_LIB=$HOME/blender-source/python/lib
+PATH_TO_BLENDER_PYTHON_LIB=$PATH_TO_BLENDER_RELEASE/python/lib
 PYTHON_VERSION_2DIGITS=$(ls $PATH_TO_BLENDER_PYTHON_LIB | egrep -o '[0-9]+[.][[:digit:]]+' | head -n1)
 echo "Python version: "$PYTHON_VERSION_2DIGITS
 PATH_TO_BLENDER_PYTHON_LIB=$PATH_TO_BLENDER_PYTHON_LIB"/python"$PYTHON_VERSION_2DIGITS
@@ -22,6 +33,7 @@ echo "Python library path (blender bundled python):" $PATH_TO_BLENDER_PYTHON_LIB
 echo ""
 echo "================="
 echo "====== INPUT"
+# Number of runtime arguments given to script:
 #echo $#
 SHALL_REDOWNLOAD=1
 SHALL_REBUILD=0
@@ -116,14 +128,14 @@ echo "====== FETCH"
 echo 'Fetching BlenderCAM addon by hero Vilem:'
 #sudo $PACKAGE_MANAGER_INSTALL_COMMAND svn
 cd 
-PATH_TO_ADDON=BlenderCAM
-if ! [[ -d $PATH_TO_ADDON ]]; then
+PATH_TO_BLENDERCAM_ADDON=$HOME/BlenderCAM
+if ! [[ -d $PATH_TO_BLENDERCAM_ADDON ]]; then
 	echo 'Downloading BlenderCAM addon ...'
     svn checkout http://blendercam.googlecode.com/svn/trunk/ BlenderCAM
 	echo '*done*'
 else
 	echo 'Updating BlenderCAM addon ...'
-	cd $PATH_TO_ADDON
+	cd $PATH_TO_BLENDERCAM_ADDON
 	echo '*done*'
 	svn up
 fi
@@ -308,7 +320,7 @@ ln -s $HOME/python-shapely/build/lib.linux-$(uname -m)-$PYTHON_VERSION_2DIGITS/s
 echo 'Created symbolic link for shapely.'
 
 rm $PATH_TO_BLENDER_PYTHON_LIB/Polygon
-#ln -s $HOME/python-polygon/Polygon ./blender-source/python/lib/python3.4/
+#ln -s $HOME/python-polygon/Polygon ./blendercad/python/lib/python3.4/
 # Using build/.../Polygon as there cPolygon exists. Do not copy over or symlink ./Polygon instead. It will not contain compiled cPolygon. The instructions on Blendercam.blogspot.cz did not work for me.
 ln -s $HOME/python-polygon/build/lib.linux-$(uname -m)-$PYTHON_VERSION_2DIGITS/Polygon $PATH_TO_BLENDER_PYTHON_LIB/
 echo 'Created symbolic link for Polygon.'
@@ -325,50 +337,60 @@ echo 'Created symbolic link for Polygon.'
 # Assuming blendercam uses sys.path.append: 
 #ln -s $HOME/python-polygon/build/lib.linux-$(uname -m)-$PYTHON_VERSION_2DIGITS/Polygon $PATH_TO_BLENDER_PYTHON_LIB/site-packages/
 #echo 'Linked polygon into site-packages.'
-#ln -s $HOME/python-polygon/build/lib.linux-$(uname -m)-3.2/Polygon/*.so ./blender-source/../lib/
+#ln -s $HOME/python-polygon/build/lib.linux-$(uname -m)-3.2/Polygon/*.so ./blendercad/../lib/
 #ln -s $HOME/python-polygon/build/lib.linux-$(uname -m)-$PYTHON_VERSION_2DIGITS/Polygon $PATH_TO_BLENDER_PYTHON_LIB/site-packages/
 #echo 'Linked shared objects to blenderxyz/lib/ (e.g. cPolygon.so).'
 
 cd
 echo 'Creating symbolic link for config: '
-rm ./blender-source/config # <-- not deletes if it's a directory, thus this is safe.
-ln -s $HOME/$PATH_TO_ADDON/config blender-source/
+PATH_TO_BLENDER_CONFIG=$PATH_TO_BLENDER_RELEASE/config
+if [ -d $PATH_TO_BLENDER_CONFIG ]; then
+	PATH_TO_BLENDER_CONFIG_BACKUP=$PATH_TO_BLENDER_CONFIG $PATH_TO_BLENDER_CONFIG'.bak'
+	echo 'Warning: config directory already exists. Backing up to '
+	mv -i $PATH_TO_BLENDER_CONFIG $PATH_TO_BLENDER_CONFIG_BACKUP
+elif [ -f $PATH_TO_BLENDER_CONFIG ]; then
+   	rm $PATH_TO_BLENDER_CONFIG # <-- not deletes if it's a directory, thus this is safe.
+fi
+
+ln -s $HOME/$PATH_TO_BLENDERCAM_ADDON/config $PATH_TO_BLENDER_RELEASE/
 echo '*done*'
 
 # TODO iterate, i.e. treat one by one and remove existing old version first.
 #echo "-------------------------------------------"
 echo '-----------------'
 echo 'Cleaning previously linked(older script version) or copied over addons (files only!):'
-rm blender-source/scripts/addons/cam
-rm blender-source/scripts/addons/print_3d
-rm blender-source/scripts/addons/scan_tools.py
-rm blender-source/scripts/addons/select_similar.py
+rm $PATH_TO_BLENDER_RELEASE/scripts/addons/cam
+rm $PATH_TO_BLENDER_RELEASE/scripts/addons/print_3d
+rm $PATH_TO_BLENDER_RELEASE/scripts/addons/scan_tools.py
+rm $PATH_TO_BLENDER_RELEASE/scripts/addons/select_similar.py
 echo '*done*'
 
 echo 'Cleaning previously linked(older script version) or copied over presets (files only!):'
-rm blender-source/scripts/presets/cam_cutters
-rm blender-source/scripts/presets/cam_machines
-rm blender-source/scripts/presets/cam_operations
+rm $PATH_TO_BLENDER_RELEASE/scripts/presets/cam_cutters
+rm $PATH_TO_BLENDER_RELEASE/scripts/presets/cam_machines
+rm $PATH_TO_BLENDER_RELEASE/scripts/presets/cam_operations
 echo '*done*'
 
 echo 'Copying over addons to scripts/addons/ :'
-rsync -vaz --exclude=".*" $HOME/$PATH_TO_ADDON/scripts/addons/* blender-source/scripts/addons/
-#cp -r $HOME/$PATH_TO_ADDON/scripts/addons/* blender-source/scripts/addons/
-#ln -s $HOME/$PATH_TO_ADDON/scripts/addons/* blender-source/scripts/addons/
+rsync -vaz --exclude=".*" $HOME/$PATH_TO_BLENDERCAM_ADDON/scripts/addons/* $PATH_TO_BLENDER_RELEASE/scripts/addons/
+#cp -r $HOME/$PATH_TO_BLENDERCAM_ADDON/scripts/addons/* $PATH_TO_BLENDER_RELEASE/scripts/addons/
+#ln -s $HOME/$PATH_TO_BLENDERCAM_ADDON/scripts/addons/* $PATH_TO_BLENDER_RELEASE/scripts/addons/
 echo '*done*'
 echo 'Copying blenderCAM presets over to blender scripts/presets/.'
-rsync -vaz --exclude=".*" $HOME/$PATH_TO_ADDON/scripts/presets/* blender-source/scripts/presets/
-#cp -r $HOME/$PATH_TO_ADDON/scripts/presets/* blender-source/scripts/presets/
+rsync -vaz --exclude=".*" $HOME/$PATH_TO_BLENDERCAM_ADDON/scripts/presets/* $PATH_TO_BLENDER_RELEASE/scripts/presets/
+#cp -r $HOME/$PATH_TO_BLENDERCAM_ADDON/scripts/presets/* $PATH_TO_BLENDER_RELEASE/scripts/presets/
 echo '*done*'
-#ln -s $HOME/$PATH_TO_ADDON/scripts/presets/* blender-source/scripts/presets/
+#ln -s $HOME/$PATH_TO_BLENDERCAM_ADDON/scripts/presets/* $PATH_TO_BLENDER_RELEASE/scripts/presets/
 
 # LAUNCH BLENDER
 echo ""
 echo "================="
 echo "======= LAUNCH "
 cd
-chmod +x ./blender-source/../blender
-rm blender
-ln -s ./blender-source/../blender blender
-./blender
+#echo 'Creating shortcut in home directory for blendercam ...'
+#rm blendercam-exec <-- because 'blendercam' is for the release files, thus can't be used.
+#ln -s $PATH_TO_BLENDER_RELEASE/../blender blendercam-exec
+echo "Launching blendercam ($PATH_TO_BLENDER_RELEASE/../blender)..."
+chmod +x $PATH_TO_BLENDER_RELEASE/../blender
+$PATH_TO_BLENDER_RELEASE/../blender
 
