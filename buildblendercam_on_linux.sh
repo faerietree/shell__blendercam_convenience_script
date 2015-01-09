@@ -352,7 +352,7 @@ elif [ -f $PATH_TO_BLENDER_CONFIG ]; then
    	rm $PATH_TO_BLENDER_CONFIG # <-- not deletes if it's a directory, thus this is safe.
 fi
 
-ln -s $HOME/$PATH_TO_BLENDERCAM_ADDON/config $PATH_TO_BLENDER_RELEASE/
+ln -s $PATH_TO_BLENDERCAM_ADDON/config $PATH_TO_BLENDER_RELEASE/
 echo '*done*'
 
 # TODO iterate, i.e. treat one by one and remove existing old version first.
@@ -372,15 +372,15 @@ rm $PATH_TO_BLENDER_RELEASE/scripts/presets/cam_operations
 echo '*done*'
 
 echo 'Copying over addons to scripts/addons/ :'
-rsync -vaz --exclude=".*" $HOME/$PATH_TO_BLENDERCAM_ADDON/scripts/addons/* $PATH_TO_BLENDER_RELEASE/scripts/addons/
-#cp -r $HOME/$PATH_TO_BLENDERCAM_ADDON/scripts/addons/* $PATH_TO_BLENDER_RELEASE/scripts/addons/
-#ln -s $HOME/$PATH_TO_BLENDERCAM_ADDON/scripts/addons/* $PATH_TO_BLENDER_RELEASE/scripts/addons/
+rsync -vaz --exclude=".*" $PATH_TO_BLENDERCAM_ADDON/scripts/addons/* $PATH_TO_BLENDER_RELEASE/scripts/addons/
+#cp -r $PATH_TO_BLENDERCAM_ADDON/scripts/addons/* $PATH_TO_BLENDER_RELEASE/scripts/addons/
+#ln -s $PATH_TO_BLENDERCAM_ADDON/scripts/addons/* $PATH_TO_BLENDER_RELEASE/scripts/addons/
 echo '*done*'
 echo 'Copying blenderCAM presets over to blender scripts/presets/.'
 rsync -vaz --exclude=".*" $HOME/$PATH_TO_BLENDERCAM_ADDON/scripts/presets/* $PATH_TO_BLENDER_RELEASE/scripts/presets/
-#cp -r $HOME/$PATH_TO_BLENDERCAM_ADDON/scripts/presets/* $PATH_TO_BLENDER_RELEASE/scripts/presets/
+#cp -r $PATH_TO_BLENDERCAM_ADDON/scripts/presets/* $PATH_TO_BLENDER_RELEASE/scripts/presets/
 echo '*done*'
-#ln -s $HOME/$PATH_TO_BLENDERCAM_ADDON/scripts/presets/* $PATH_TO_BLENDER_RELEASE/scripts/presets/
+#ln -s $PATH_TO_BLENDERCAM_ADDON/scripts/presets/* $PATH_TO_BLENDER_RELEASE/scripts/presets/
 
 # LAUNCH BLENDER
 echo ""
