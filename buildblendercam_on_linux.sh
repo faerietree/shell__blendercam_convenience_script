@@ -344,7 +344,8 @@ echo 'Created symbolic link for Polygon.'
 cd
 echo 'Creating symbolic link for config: '
 PATH_TO_BLENDER_CONFIG=$PATH_TO_BLENDER_RELEASE/config
-if [ -d $PATH_TO_BLENDER_CONFIG ]; then
+# Only backup directory if it's not a symbolic link to a directory:
+if [ -d $PATH_TO_BLENDER_CONFIG && ! -L $PATH_TO_BLENDER_CONFIG ]; then 
 	PATH_TO_BLENDER_CONFIG_BACKUP=$PATH_TO_BLENDER_CONFIG'.bak'
 	echo 'Warning: config directory already exists. Backing up to '
 	mv -i $PATH_TO_BLENDER_CONFIG $PATH_TO_BLENDER_CONFIG_BACKUP
