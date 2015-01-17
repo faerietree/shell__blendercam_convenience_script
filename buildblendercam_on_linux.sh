@@ -173,6 +173,41 @@ echo "Looking for $SEEK:"
 #echo "Result: $PYTHON_SHAPELY"
 if ! [[ -d $SEEK ]]; then 
 	echo 'Not found. Will fetch into '$SEEK':'
+	#http://stackoverflow.com/questions/592620/check-if-a-program-exists-from-a-bash-script
+	if [ command -v git >/dev/null 2>&1 ]; then
+ 	   	echo "Program 'git' is required but is not installed."#" Aborting ..."
+ 	    if [ command -v apt-get >/dev/null 2>&1 ]; then
+ 		   	sudo apt-get install git
+		else:
+			cd /tmp
+			if [ -f /tmp/kx ]; then
+				rm /tmp/kx
+			fi
+			wget https://raw.githubusercontent.com/faerietree/kx/master/kx
+			chmod +x /tmp/kx
+			CMD=$(/tmp/kx install)' git'
+			CMD_maincommand=""
+			count=0
+            for CMD_part in "${CMD[@]}"; do
+				# the first one may be sudo:
+				if [[ ! $CMD_part='sudo' ]]; then
+				    CMD_maincommand=$CMD_part
+					echo $CMD_maincommand
+				    break
+				fi
+				count=count+1
+			done
+			if [ command -v ${CMD_maincommand} >/dev/null 2>&1 ]; then
+ 	   	        echo >&2 "Couldn't automatically install it. CMD not exists: "$CMD_maincommand". Aborting ..."
+		        exit 1
+			fi
+			echo 'Installing git ...'
+			$($CMD)
+			echo '*done*'
+		fi
+	fi
+	#type foo >/dev/null 2>&1 || { echo >&2 "I require foo but it's not installed.  Aborting."; exit 1; }
+	#hash foo 2>/dev/null || { echo >&2 "I require foo but it's not installed.  Aborting."; exit 1; }i
 	git clone git@github.com:Toblerity/Shapely.git "./$SEEK"
 else 
 	echo 'Found it in folder: '$SEEK
