@@ -78,7 +78,7 @@ do
 	        shift
             ;;
 		--pacman)
-			PACKAGE_MANAGER_INSTALL_COMMAND=' pacman -S install '
+			PACKAGE_MANAGER_INSTALL_COMMAND=' pacman -S '
 	        shift
             ;;
 		--yaourt)
