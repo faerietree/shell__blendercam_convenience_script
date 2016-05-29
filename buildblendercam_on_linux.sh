@@ -2,7 +2,10 @@
 
 # PREREQUISITES:
 # Set the corresponding symbolic link for blender: (blender must exist in $HOME directory)
-#ln -s ./blender-2.73-rc1-linux-glibc211-x86_64_blendercam/2.73 blendercam
+#cd $HOME
+#ln -s relative/path/to/blender-2.73-rc1-linux-glibc211-x86_64_blendercam/2.73 blendercam
+
+#~/blendercam/../blender # to test or run
 
 
 echo "================="
