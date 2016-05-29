@@ -280,40 +280,10 @@ if [ -f python.tgz ] && [ $SHALL_REDOWNLOAD -ne 0 ]; then
 fi
 echo '*done*'
 
-PYTHON_VERSION=$PYTHON_VERSION_2DIGITS'.0'
-if ! [[ -f python.tgz ]]; then
-    echo 'Downloading python in version '$PYTHON_VERSION':'
-    wget https://www.python.org/ftp/python/$PYTHON_VERSION/Python-$PYTHON_VERSION.tgz  -O python.tgz
-fi
 
-if ! [[ -d "Python-"$PYTHON_VERSION ]]; then
-    echo 'Unpacking ...'
-    tar xzf python.tgz
-    echo '*done*'
-fi
-
-PATH_TO_ALTINSTALL=$HOME/lib/
-if ! [[ -d $PATH_TO_ALTINSTALL ]]; then
-    mkdir $PATH_TO_ALTINSTALL
-fi
-PATH_TO_PYTHON=$PATH_TO_ALTINSTALL'/bin/python'$PYTHON_VERSION_2DIGITS
-if [ ! -f $PATH_TO_PYTHON ] || [ $SHALL_REBUILD ]; then
-    echo 'Building python in directory ./Python-'$PYTHON_VERSION
-    cd './Python-'$PYTHON_VERSION
-    pwd
-	echo 'Using prefix:'$PATH_TO_ALTINSTALL
-	ls
-	./configure --prefix=$PATH_TO_ALTINSTALL
-	#make
-	make altinstall
-	echo '*done*'
-    echo '-----------------'
-	
-    echo 'Using python altinstall binary '$PATH_TO_PYTHON' for the following library builds.'
-	
-fi
-
-
+GET_ALTERNATE_PYTHON='~/shell__coexisting_alternate_python_version/download_setup_and_get_path_to.sh'
+chmod +x $GET_ALTERNATE_PYTHON
+PATH_TO_PYTHON=`$GET_ALTERNATE_PYTHON`
 
 
 cd

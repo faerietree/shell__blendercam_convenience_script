@@ -1,7 +1,7 @@
 BlenderCAM
 =====
 http://blendercam.blogspot.cz/
-Thanks to our hero Vilem Novak for making blender engineers happy! 
+Thanks to our hero Vilem Novak for making blender engineers happy!
 
 Download, update, library build, setup convenience script.
 -----
@@ -16,20 +16,26 @@ Note: BlenderCAM tries to enable these automatically but it may fail.
 
 *"After first start everything should be set up. If you don't see CAM tabs on the right side, go to preferences-addons and enable the Simplify curves addon and CAM addon. Also, if Blender CAM tabs don't show, change Blender Render to  Blender CAM [or `print_3d`] in the upper header." (Vilem Novak, BlenderCAM creator)*
 
+Dependencies:
+---
+* http://github.com/faerietree/shell_coexist_python_version
+
 
 Setup:
 ---
 WARNING: DON'T USE YOUR ART BLENDER SETUP FOR THIS! DOWNLOAD ANOTHER ONE OR COPY THE EXISTING BLENDER FOLDER. (Because a new config is copied automatically to the blender in the folder blender-srouce. Better to be safe!)
 
 
-### Download Script:
+### Download script + dependency:
 
     cd
+    git clone https://github.com/faerietree/shell__coexist_python_version.git
     git clone https://github.com/faerietree/shell__blendercam_convenience_script.git
 
 OR (quicker)
 
     cd
+    git clone git@github.com:faerietree/shell__coexist_python_version.git
     git clone git@github.com:faerietree/shell__blendercam_convenience_script.git
 
 
