@@ -20,7 +20,7 @@ elif [ ! -z $BLENDER_RELEASE_PATH ]; then
 	echo 'Using user provided blender release: '$BLENDER_RELEASE_PATH
 	PATH_TO_BLENDER_RELEASE=$BLENDER_RELEASE_PATH
 else
-    PATH_TO_BLENDER_RELEASE=~/blendercam
+	PATH_TO_BLENDER_RELEASE=~/blendercam
 	echo 'Using default blender release location: '$PATH_TO_BLENDER_RELEASE
 fi
 
@@ -49,77 +49,77 @@ PACKAGE_MANAGER_INSTALL_COMMAND=' apt-get install ' #because it's available most
 #for i # <- for each  argument, terminate if no more arguments, see below
 while :
 do
-    echo $1 #use $i
-    # Note: Empty space is the delimiter! => $1 is first, after space is $2.
-    case $1 in
-        -h | --help | -\?)
-            #TODO create help function to call?
+	echo $1 #use $i
+	# Note: Empty space is the delimiter! => $1 is first, after space is $2.
+	case $1 in
+		-h | --help | -\?)
+			#TODO create help function to call?
 			echo "Use like /path/to/buildblendercam_on_linux.sh --no-redownload --install_missing[_packages] --yaourt --yum --pacman --apt-get --aptitude --package_manager_install_command=' pacman -Sa '"
-            exit 0    # This is not an error, User asked for help. Don't "exit 1"
-            ;;
-			
-        --no-redownload)
-            SHALL_REDOWNLOAD=0
-	        shift
-            ;;
-        --rebuild*)
-            SHALL_REBUILD=1
-	        shift
-            ;;
-			
-        --package_manager_install_command=*)
+			exit 0	# This is not an error, User asked for help. Don't "exit 1"
+			;;
+
+		--no-redownload)
+			SHALL_REDOWNLOAD=0
+			shift
+			;;
+		--rebuild*)
+			SHALL_REBUILD=1
+			shift
+			;;
+
+		--package_manager_install_command=*)
 			PACKAGE_MANAGER_INSTALL_COMMAND=${1#*=}
-	        shift 1
-            ;;
-			
+			shift 1
+			;;
+
 		--apt-get)
 			PACKAGE_MANAGER_INSTALL_COMMAND=' apt-get install '
-	        shift
-            ;;
+			shift
+			;;
 		--aptitude)
 			PACKAGE_MANAGER_INSTALL_COMMAND=' aptitude install '
-	        shift
-            ;;
+			shift
+			;;
 		--pacman)
 			PACKAGE_MANAGER_INSTALL_COMMAND=' pacman -S '
-	        shift
-            ;;
+			shift
+			;;
 		--yaourt)
 			PACKAGE_MANAGER_INSTALL_COMMAND=' yaourt -Sa '
-	        shift
+			shift
 			;;
 		--yum)
 			PACKAGE_MANAGER_INSTALL_COMMAND=' yum install '
-	        shift
-            ;;
-        --install_missing* | --install-missing*)
-            SHALL_INSTALL_PACKAGES=true
-	        shift
-            ;;
-		
-		--prefix=*)
-            AD=${1#*=}    # Deletes everything before first occurrence of = (inclusively).
-            shift
+			shift
 			;;
-			
-        -v | --verbose)
-            # Each instance of -v adds 1 to verbosity
-            verbose=$((verbose+1))
-            shift
-            ;;
-        --) # End of all options
-            shift
-            break
-            ;;
-        -*)
-            printf >&2 'WARN: Unknown option (ignored): %s\n' "$1"
-            shift
-            ;;
+		--install_missing* | --install-missing*)
+			SHALL_INSTALL_PACKAGES=true
+			shift
+			;;
 
-			
-        *)  # no more options. Stop while loop. #<-- Note: This must be the last check condition as it matches always.
-            break
-            ;;
+		--prefix=*)
+			AD=${1#*=}	# Deletes everything before first occurrence of = (inclusively).
+			shift
+			;;
+
+		-v | --verbose)
+			# Each instance of -v adds 1 to verbosity
+			verbose=$((verbose+1))
+			shift
+			;;
+		--) # End of all options
+			shift
+			break
+			;;
+		-*)
+			printf >&2 'WARN: Unknown option (ignored): %s\n' "$1"
+			shift
+			;;
+
+
+		*)  # no more options. Stop while loop. #<-- Note: This must be the last check condition as it matches always.
+			break
+			;;
 	esac
 done
 
@@ -130,11 +130,11 @@ echo "================="
 echo "====== FETCH"
 echo 'Fetching or updating BlenderCAM addon by hero Vilem:'
 #sudo $PACKAGE_MANAGER_INSTALL_COMMAND svn
-cd 
+cd
 PATH_TO_BLENDERCAM_ADDON=$HOME/BlenderCAM
 if ! [[ -d $PATH_TO_BLENDERCAM_ADDON ]]; then
 	echo 'Downloading BlenderCAM addon ...'
-    svn checkout http://blendercam.googlecode.com/svn/trunk/ BlenderCAM
+	svn checkout http://blendercam.googlecode.com/svn/trunk/ BlenderCAM
 	echo '*done*'
 else
 	echo 'Updating BlenderCAM addon ...'
@@ -174,13 +174,13 @@ SEEK="python-shapely"
 echo "Looking for $SEEK:"
 #PYTHON_SHAPELY=$(find $HOME -type d -name "*$SEEK*")
 #echo "Result: $PYTHON_SHAPELY"
-if ! [[ -d $SEEK ]]; then 
+if ! [[ -d $SEEK ]]; then
 	echo 'Not found. Will fetch into '$SEEK':'
 	#http://stackoverflow.com/questions/592620/check-if-a-program-exists-from-a-bash-script
 	if [ command -v git >/dev/null 2>&1 ]; then
- 	   	echo "Program 'git' is required but is not installed."#" Aborting ..."
- 	    if [ command -v apt-get >/dev/null 2>&1 ]; then
- 		   	sudo apt-get install git
+		echo "Program 'git' is required but is not installed."#" Aborting ..."
+		if [ command -v apt-get >/dev/null 2>&1 ]; then
+			sudo apt-get install git
 		else:
 			cd /tmp
 			if [ -f /tmp/kx ]; then
@@ -191,18 +191,18 @@ if ! [[ -d $SEEK ]]; then
 			CMD=$(/tmp/kx install)' git'
 			CMD_maincommand=""
 			count=0
-            for CMD_part in "${CMD[@]}"; do
+			for CMD_part in "${CMD[@]}"; do
 				# the first one may be sudo:
 				if [[ ! $CMD_part='sudo' ]]; then
-				    CMD_maincommand=$CMD_part
+					CMD_maincommand=$CMD_part
 					echo $CMD_maincommand
-				    break
+					break
 				fi
 				count=count+1
 			done
 			if [ command -v ${CMD_maincommand} >/dev/null 2>&1 ]; then
- 	   	        echo >&2 "Couldn't automatically install it. CMD not exists: "$CMD_maincommand". Aborting ..."
-		        exit 1
+				echo >&2 "Couldn't automatically install it. CMD not exists: "$CMD_maincommand". Aborting ..."
+				exit 1
 			fi
 			echo 'Installing git ...'
 			$($CMD)
@@ -212,7 +212,7 @@ if ! [[ -d $SEEK ]]; then
 	#type foo >/dev/null 2>&1 || { echo >&2 "I require foo but it's not installed.  Aborting."; exit 1; }
 	#hash foo 2>/dev/null || { echo >&2 "I require foo but it's not installed.  Aborting."; exit 1; }i
 	git clone git@github.com:Toblerity/Shapely.git "./$SEEK"
-else 
+else
 	echo 'Found it in folder: '$SEEK
 	cd $SEEK
 	git pull
@@ -228,7 +228,7 @@ echo "Looking for $SEEK:"
 if ! [[ -d $SEEK ]]; then
 	echo 'Not found.'
 	git clone git://github.com/numpy/numpy.git "./"$SEEK
-else 
+else
 	echo 'Found it in folder: '$SEEK
 	cd $SEEK
 	git pull
@@ -249,7 +249,7 @@ tar xzf numpy.tar.gz --directory .
 sudo rm python-numpy-snapshot -r
 mv "numpy-"$VERSION python-numpy-snapshot #overwrites!
 echo '-----------------'
-	
+
 
 
 # BUILD
@@ -260,16 +260,16 @@ echo "====== BUILD"
 if [[ $SHALL_INSTALL_PACKAGES ]]; then
 	echo 'Package install command: '$PACKAGE_MANAGER_INSTALL_COMMAND
 	echo "Installing additional packages if not exist: python3-dev, cython, libgeos-dev:"
-    sudo $PACKAGE_MANAGER_INSTALL_COMMAND cython
-    sudo $PACKAGE_MANAGER_INSTALL_COMMAND libgeos-dev
-    #sudo aptitude install python-dev
-    #which python
-    #python --version
+	sudo $PACKAGE_MANAGER_INSTALL_COMMAND cython
+	sudo $PACKAGE_MANAGER_INSTALL_COMMAND libgeos-dev
+	#sudo aptitude install python-dev
+	#which python
+	#python --version
 	echo 'As it is not guarantueed that the python3 version in the package repositories match the blender version: '$PYTHON_VERSION_2DIGITS'. We will custom download and (alt)install the correct version.'
-#    sudo $PACKAGE_MANAGER_INSTALL_COMMAND python3-dev python3-devel
-#    sudo $PACKAGE_MANAGER_INSTALL_COMMAND python3-numpy
-    which python3
-    python3 --version
+#	sudo $PACKAGE_MANAGER_INSTALL_COMMAND python3-dev python3-devel
+#	sudo $PACKAGE_MANAGER_INSTALL_COMMAND python3-numpy
+	which python3
+	python3 --version
 fi
 
 
@@ -279,7 +279,7 @@ echo "======= CREATE MATCHING PYTHON"
 cd
 if [ -f python.tgz ] && [ $SHALL_REDOWNLOAD -ne 0 ]; then
 	echo 'Deleting previously downloaded python (it may be broken so redownload to be safe):'
-    rm python.tgz
+	rm python.tgz
 fi
 echo '*done*'
 
@@ -297,7 +297,7 @@ sudo $PATH_TO_PYTHON setup.py build
 #sudo python3 python-numpy-snapshot/setup.py install  #<-- numpy is required for polygon -- NOTE: Not working from within the source directory?
 echo '*done*'
 
-cd 
+cd
 echo 'Building shapely:'
 cd python-shapely
 sudo $PATH_TO_PYTHON setup.py build
@@ -316,7 +316,7 @@ echo ""
 echo "================="
 echo "======= INTEGRATE INTO BLENDER"
 # setup up symbolic links:
-cd 
+cd
 rm $PATH_TO_BLENDER_PYTHON_LIB/numpy
 #ln -s $HOME/python-numpy-snapshot/numpy $PATH_TO_BLENDER_PYTHON_LIB/
 ln -s $HOME/python-numpy-snapshot/build/lib.linux-$(uname -m)-$PYTHON_VERSION_2DIGITS/numpy $PATH_TO_BLENDER_PYTHON_LIB/
@@ -336,13 +336,13 @@ echo 'Created symbolic link for Polygon.'
 #see here for why this is not necessarily possible:
 #http://blender.stackexchange.com/questions/8509/including-3rd-party-modules-in-a-blender-addon
 # either
-#    provide a complete, customized blender build
-#	    or
-#    ask your users to manually place the required lib into python/lib/pythonV.V/site-packages folder.
-#	    or
-#    add the lib to your addon folder and import it from there (sys.path.append should do the trick)
+#	provide a complete, customized blender build
+#		or
+#	ask your users to manually place the required lib into python/lib/pythonV.V/site-packages folder.
+#		or
+#	add the lib to your addon folder and import it from there (sys.path.append should do the trick)
 #'''
-# Assuming blendercam uses sys.path.append: 
+# Assuming blendercam uses sys.path.append:
 #ln -s $HOME/python-polygon/build/lib.linux-$(uname -m)-$PYTHON_VERSION_2DIGITS/Polygon $PATH_TO_BLENDER_PYTHON_LIB/site-packages/
 #echo 'Linked polygon into site-packages.'
 #ln -s $HOME/python-polygon/build/lib.linux-$(uname -m)-3.2/Polygon/*.so ./blendercad/../lib/
@@ -353,12 +353,12 @@ cd
 echo 'Creating symbolic link for config: '
 PATH_TO_BLENDER_CONFIG=$PATH_TO_BLENDER_RELEASE/config
 # Only backup directory if it's not a symbolic link to a directory:
-if [ -d $PATH_TO_BLENDER_CONFIG && ! -L $PATH_TO_BLENDER_CONFIG ]; then 
+if [ -d $PATH_TO_BLENDER_CONFIG && ! -L $PATH_TO_BLENDER_CONFIG ]; then
 	PATH_TO_BLENDER_CONFIG_BACKUP=$PATH_TO_BLENDER_CONFIG'.bak'
 	echo 'Warning: config directory already exists. Backing up to '
 	mv -i $PATH_TO_BLENDER_CONFIG $PATH_TO_BLENDER_CONFIG_BACKUP
 elif [ -f $PATH_TO_BLENDER_CONFIG ]; then
-   	rm $PATH_TO_BLENDER_CONFIG # <-- not deletes if it's a directory, thus this is safe.
+	rm $PATH_TO_BLENDER_CONFIG # <-- not deletes if it's a directory, thus this is safe.
 fi
 
 ln -s $PATH_TO_BLENDERCAM_ADDON/config $PATH_TO_BLENDER_RELEASE/
@@ -387,7 +387,7 @@ echo 'Linking blenderCAM addons to scripts/addons/ :'
 ln -s $PATH_TO_BLENDERCAM_ADDON/scripts/addons/* $PATH_TO_BLENDER_RELEASE/scripts/addons
 #if [ -d $HOME/addons__only_put_here_links ]; then
 #	echo 'For optional completeness also linking them into the folder for gathering all addons.'
-#    ln -s $PATH_TO_BLENDERCAM_ADDON/scripts/addons/* $HOME/addons__only_put_here_links/
+#	ln -s $PATH_TO_BLENDERCAM_ADDON/scripts/addons/* $HOME/addons__only_put_here_links/
 #fi
 echo '*done*'
 #echo 'Copying blenderCAM presets over to blender scripts/presets/.'
