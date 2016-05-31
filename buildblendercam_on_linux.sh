@@ -198,8 +198,9 @@ if ! [[ -d $SEEK ]]; then
 					echo $CMD_maincommand
 					break
 				fi
-				count=count+1
+				count=`expr $count + 1`
 			done
+			#echo 'count: '$count
 			if [ command -v ${CMD_maincommand} >/dev/null 2>&1 ]; then
 				echo >&2 "Couldn't automatically install it. CMD not exists: "$CMD_maincommand". Aborting ..."
 				exit 1
