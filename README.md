@@ -83,3 +83,8 @@ Usage:
 * Follow the progress of the script, it may need input (for package manager or library build or to remove downloaded files, use CTRL+C when asked for an administrator password if you don't trust, then you'll see that the removed files are just the downloaded ones.).
 
 
+Test:
+---
+
+    ~/blendercam/../blender
+
