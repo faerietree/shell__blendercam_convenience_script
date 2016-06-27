@@ -23,7 +23,7 @@ Dependencies:
 
 Setup:
 ---
-WARNING: DON'T USE YOUR ART BLENDER SETUP FOR THIS! DOWNLOAD ANOTHER ONE OR COPY THE EXISTING BLENDER FOLDER. (Because a new config is copied automatically to the blender in the folder blender-srouce. Better to be safe!)
+WARNING: DON'T USE YOUR ART BLENDER SETUP FOR THIS! DOWNLOAD ANOTHER ONE OR COPY THE EXISTING BLENDER FOLDER. (Because a new config is copied automatically to the blender in the folder blender-source. Better to be safe!)
 
 
 ### Download script + dependency:
