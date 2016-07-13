@@ -1,6 +1,6 @@
 BlenderCAM
 =====
-http://blendercam.blogspot.cz/
+https://github.com/vilemnovak/blendercam
 Thanks to our hero Vilem Novak for making blender engineers happy!
 
 Download, update, library build, setup convenience script.
